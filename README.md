@@ -1,17 +1,15 @@
-# My Lang
-Short about section
+# C--, like C but a bit worse
+This project is a compiler for a toy language called c--, as the name suggests it is similar to C but a bit simplified. My plan is to iteratively add new features, but is very unlike that it ever goes from c-- to full c89 (or newer).
+
+**Note: This is strictly a hobby project and is not built to be used for production purposes**
 
 ## Formal Grammar specification
 The language grammar expressed in EBNF:
 ```
-// Program structure && functions
-program             -> functionDefinition+ //empty programs considered invalid
-functionDefinition  -> "def" IDENTIFIER "(" ")" "{" statement* "}"
-
-// Statements
-statement           -> declaration | assignment
-declaration         -> "var" IDENTIFIER ["=" expr] ";"
-assignment          -> IDENTIFIER "=" expr ";"
+// Functions
+function -> prototype expr
+prototype -> int identifier '(' (int identifier)* ')'
+extern -> 'extern' prototype
 
 // Expressions
 expr -> primary_expr bin_expr
@@ -26,9 +24,11 @@ bin_expr -> (bin_op primary_expr)* // left recursive
 bin_op -> '+' | '-' | '*' | '<'
 
 ```
-
 ## Implementation details
 ### Lexer
 ...
 ### Parser
-...
+Handwritten recursive decent parser
+
+### Backend
+Is currently planned to be written in llvm.
