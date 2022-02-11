@@ -1,2 +1,7 @@
+# Compiled binaries and object files
 obj/**
 bin/**
+
+# VS-code files
+.vscode
+vgcore.*
