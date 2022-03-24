@@ -31,9 +31,11 @@ static expr_ast *create_expr(int type, int value, char op, char *identifier, exp
     case CALL:
         e->data.call.params = parms;
         e->data.call.nbr_params = value;
-        e->data.call.callee = identifier;
-        return e;
+        // Make sure strings are copied
+        e->data.call.callee = copy_str(identifier);
     }
+
+    return e;
 }
 
 expr_ast *create_bin_expr(int op_token, expr_ast *left, expr_ast *right)
@@ -78,4 +80,57 @@ expr_ast *create_var_expr(char *identifier)
 expr_ast *create_call_expr(char *callee, expr_ast *params, int nbr_params)
 {
     return create_expr(CALL, nbr_params, 0, callee, NULL, NULL, params);
+}
+
+prototype_ast *create_prototype_ast(char *identifier, char **args, size_t n_args)
+{
+    prototype_ast *proto = calloc(1, sizeof(prototype_ast));
+    proto->identifier = identifier;
+    proto->args = args;
+    proto->n_args = n_args;
+
+    return proto;
+}
+
+func_ast *create_func_ast(prototype_ast *prototype, expr_ast *body)
+{
+    func_ast *func = calloc(1, sizeof(func_ast));
+    func->prototype = prototype;
+    func->body = body;
+
+    return func;
+}
+
+void print(expr_ast *expr, int indent, FILE *fp)
+{
+    for (int i = 0; i < indent * INDENT; i++)
+        fprintf(fp, " ");
+
+    switch (expr->type)
+    {
+    case BINARY:
+        fprintf(fp, "BinaryExpr: %c\n", expr->data.bin_exprs.op);
+        print(expr->data.bin_exprs.left, indent + 1, fp);
+        print(expr->data.bin_exprs.right, indent + 1, fp);
+        break;
+
+    case CONSTANT:
+        fprintf(fp, "ConstExpr: %d\n", expr->data.value);
+        break;
+
+    case VAR_USE:
+        fprintf(fp, "VarUseExpr: %s\n", expr->data.identifier);
+        break;
+
+    case CALL:
+        fprintf(fp, "CallExpr: %s, %d args\n", expr->data.call.callee, expr->data.call.nbr_params);
+        for (int i = 0; i < expr->data.call.nbr_params; i++)
+        {
+            print(expr->data.call.params + i, indent + 1, fp);
+        }
+        break;
+
+    default:
+        error("ast error", "expr of invalid type %d", expr->type);
+    }
 }

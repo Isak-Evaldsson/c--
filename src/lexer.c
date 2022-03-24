@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdarg.h>
@@ -19,11 +18,14 @@ char token_id[IDENTIFIER_MAX_LENGTH];
 // Internal variable storing current look-ahead char in stdin
 static int current_char = ' ';
 
+// Internal variable storing the file to be read
+static FILE *src_file = NULL;
+
 // Consumes the currnet look-ahead char, returns the old look-ahead char
 static int consume()
 {
     int old_char = current_char;
-    current_char = getchar();
+    current_char = fgetc(src_file);
     postion++;
 
     if (old_char == '\n')
@@ -119,9 +121,9 @@ void get_next_token()
         tmp[i] = '\0';
 
         // Match tokens
-        if (strcmp("def", tmp) == 0)
+        if (strcmp("int", tmp) == 0)
         {
-            token_type = FUNCDEF_TOK;
+            token_type = INT_TOK;
             return;
         }
         else if (strcmp("var", tmp) == 0)
@@ -175,4 +177,17 @@ void get_next_token()
 
     // Error if input couldn't be matched to a token
     error("Lexer error", "invalid character '%c' at postion %i in line %i", current_char, postion, line_num);
+}
+
+void init_lexer(FILE *src)
+{
+    // Reseting external state
+    line_num = 1;
+    postion = 0;
+    token_type = -1;
+    token_num = 0;
+
+    // Reseting internal state
+    src_file = src;
+    current_char = ' ';
 }

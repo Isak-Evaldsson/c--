@@ -1,5 +1,9 @@
 #ifndef AST_HEADER
 #define AST_HEADER
+#include <stdio.h>
+
+// Defines number of spaces for each level of indent
+#define INDENT 4
 
 // Typedefs
 typedef struct prototype_ast prototype_ast;
@@ -13,9 +17,8 @@ typedef struct expr_ast expr_ast;
 struct prototype_ast
 {
     char *identifier;
-    char **args; // string array of arguments
-    size_t n;    // array size
-    size_t c;    // array capacity
+    char **args;   // string array of arguments
+    size_t n_args; // array size
 };
 
 // Struct representing the function definition itself.
@@ -60,5 +63,12 @@ expr_ast *create_bin_expr(int op_token, expr_ast *left, expr_ast *right);
 expr_ast *create_const_expr(int value);
 expr_ast *create_var_expr(char *identifier);
 expr_ast *create_call_expr(char *callee, expr_ast *params, int nbr_params);
+
+/* Other constructors */
+prototype_ast *create_prototype_ast(char *identifier, char **args, size_t n_args);
+func_ast *create_func_ast(prototype_ast *prototype, expr_ast *body);
+
+/* Print functions */
+void print(expr_ast *expr, int indent, FILE *fp);
 
 #endif

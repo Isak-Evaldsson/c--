@@ -3,8 +3,7 @@
 
 int main()
 {
-    // set the lexer to read from stdin
-    src_file = stdin;
+    init_lexer(stdin);
 
     if (parse())
     {

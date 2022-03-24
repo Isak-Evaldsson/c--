@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -11,8 +12,10 @@ int main(int argc, char **argv)
     DIR *FD;
     struct dirent *in_file;
     FILE *entry_file;
+    FILE *out_file;
 
-    char path[500];
+    char file_path[500];
+    char diff_comand[500] = "diff ";
     int n = 0;
     int n_succ = 0;
 
@@ -35,30 +38,55 @@ int main(int argc, char **argv)
     // Go through test files and try to parse
     while ((in_file = readdir(FD)))
     {
-        if (!strcmp(in_file->d_name, "."))
-            continue;
-        if (!strcmp(in_file->d_name, ".."))
+        // Only read in file
+        if (strstr(in_file->d_name, ".in") == NULL)
             continue;
 
         // Writes correct path
-        strcpy(path, argv[1]);
-        strcat(path, "/");
-        strcat(path, in_file->d_name);
+        strcpy(file_path, argv[1]);
+        strcat(file_path, "/");
+        strcat(file_path, in_file->d_name);
 
-        entry_file = fopen(path, "rw");
+        entry_file = fopen(file_path, "rw");
         if (entry_file == NULL)
         {
             fprintf(stderr, "Error : Failed to open entry file - %s\n", strerror(errno));
             return 1;
         }
 
-        // set the lexer to read from stdin
-        src_file = entry_file;
+        init_lexer(entry_file);
+        expr_ast *expr = parse();
+        fclose(entry_file);
 
-        if (parse())
+        if (expr != NULL)
         {
-            n_succ++;
-            printf("%s - Passed\n", in_file->d_name);
+            // Create out-file
+            size_t length = strlen(file_path);
+            file_path[length - 3] = '\0';
+            strcat(file_path, ".out");
+            out_file = fopen(file_path, "w+");
+
+            // Write ast to out-file
+            print(expr, 0, out_file);
+            fclose(out_file);
+
+            // Building command 'diff out_file expected_file'
+            strcat(diff_comand, file_path);
+            strcat(diff_comand, " ");
+            file_path[length - 3] = '\0';
+            strcat(file_path, ".expected");
+            strcat(diff_comand, file_path);
+
+            if (system(diff_comand) == 0)
+            {
+                n_succ++;
+                printf("%s - Passed\n", in_file->d_name);
+            }
+            else
+            {
+                printf("%s - Failed\n", in_file->d_name);
+            }
+            diff_comand[5] = '\0';
         }
         else
         {
@@ -66,7 +94,6 @@ int main(int argc, char **argv)
         }
 
         n++;
-        fclose(entry_file);
     }
 
     if (n_succ == n)

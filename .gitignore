@@ -2,6 +2,9 @@
 obj/**
 bin/**
 
+# Test files
+**/*.out
+
 # VS-code files
 .vscode
 vgcore.*

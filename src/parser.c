@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "parser.h"
 #include "lexer.h"
 #include "ast.h"
 #include "util.h"
@@ -25,11 +27,94 @@ static expr_ast *parse_bin_op(int expr_prec, expr_ast *lhs);
 /* Writes parser errors to stderr */
 static void *log_parse_error(char *msg)
 {
-    fprintf(stderr, "Parse error (%i: %i): %s", line_num, postion, msg);
+    fprintf(stderr, "Parse error (%i: %i): %s\n", line_num, postion, msg);
     return NULL;
 }
 
-/* 
+/*
+    Program parsing
+*/
+static prototype_ast *parse_prototype()
+{
+    int n_args = 0;
+    char tmp_args[MAX_ARGS][IDENTIFIER_MAX_LENGTH + 1];
+    char func_name[IDENTIFIER_MAX_LENGTH + 1];
+
+    // Parse function name and type
+    if (token_type != INT_TOK)
+        log_parse_error("expected type 'int' in prototype");
+
+    get_next_token(); // eat 'int'
+
+    if (token_type != IDENT_TOK)
+        log_parse_error("expected function name in prototype");
+
+    strcpy(func_name, token_id);
+    get_next_token(); // eat identifier
+
+    // Parse paramter list
+    while (true)
+    {
+        // check if parameter list has arguments
+        if (token_type != INT_TOK)
+            break;
+
+        get_next_token(); // eat 'int'
+
+        if (token_type != IDENT_TOK)
+            log_parse_error("expected argument name after type in prototype");
+
+        // copies identifier to temporary array
+        strcpy(tmp_args[n_args++], token_id);
+        get_next_token(); // eat identifier
+
+        // terminate loop
+        if (token_type != COMM_TOK)
+            break;
+    }
+    if (token_type != RPAR_TOK)
+        return log_parse_error("expected ')' in prototype");
+
+    // Create prototype
+    if (n_args == 0)
+    {
+        return create_prototype_ast(copy_str(func_name), NULL, 0);
+    }
+    else
+    {
+        // create heap copy of local arg array
+        char **args = calloc(n_args, sizeof(char *));
+
+        for (int i = 0; i < n_args; i++)
+            args[i] = copy_str(tmp_args[i]);
+
+        return create_prototype_ast(copy_str(func_name), args, n_args);
+    }
+}
+
+// function -> prototype expression
+static func_ast *parse_function()
+{
+    expr_ast *expr;
+    prototype_ast *proto;
+
+    if ((proto = parse_prototype()) == NULL)
+        return NULL;
+
+    if ((expr = parse_expr()) == NULL)
+        return NULL;
+
+    return create_func_ast(proto, expr);
+}
+
+// external -> 'extern' prototype
+static prototype_ast *parse_extern()
+{
+    get_next_token(); // eat extern.
+    return parse_prototype();
+}
+
+/*
     Expression parsing
 */
 
@@ -45,7 +130,7 @@ static expr_ast *parse_expr()
     return parse_bin_op(0, lhs);
 }
 
-//primary_expr -> identifier_expr | number_expr | parenthesis_expr
+// primary_expr -> identifier_expr | number_expr | parenthesis_expr
 static expr_ast *parse_primary()
 {
     switch (token_type)
@@ -137,20 +222,20 @@ static expr_ast *parse_paren_expr()
     expr_ast *e = parse_expr();
 
     // Empty parenthesis
-    if (parse_expr() == NULL)
+    if (e == NULL)
         return NULL;
 
-    if (token_type != LPAR_TOK)
+    if (token_type != RPAR_TOK)
         return log_parse_error("expected ')'");
 
     get_next_token(); // eat ')'
     return e;
 }
 
-/** 
+/**
  * @brief Helper function to determine precedence of the current token
  * @return precedence value 10, 20, 30 etc., or -1 if token does not have a precedence
-*/
+ */
 static int get_tok_precedence()
 {
     switch (token_type)
@@ -170,7 +255,7 @@ static int get_tok_precedence()
     }
 }
 
-//bin_expr -> (bin_op primary_expr)*
+// bin_expr -> (bin_op primary_expr)*
 static expr_ast *parse_bin_op(int expr_prec, expr_ast *lhs)
 {
     // If this is a binop, find its precedence.
@@ -209,10 +294,9 @@ static expr_ast *parse_bin_op(int expr_prec, expr_ast *lhs)
     get_next_token(); // eat operator
 }
 
-int main()
+// Parses file from stdin and retruns if it was successful or not
+expr_ast *parse()
 {
     get_next_token();
-    parse_primary();
-    printf("Program successfully parsed\n");
-    return 0;
+    return parse_expr();
 }

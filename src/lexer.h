@@ -1,5 +1,9 @@
 #ifndef LEXER_HEADER
 #define LEXER_HEADER
+#include <stdio.h>
+
+// Defines number of spaces for each level of indent
+#define INDENT 4
 
 // Defines max length of identifiers in order to prevent buffer overflows
 #define IDENTIFIER_MAX_LENGTH 40
@@ -23,8 +27,8 @@ typedef enum
     MUL_TOK,    // '*'
 
     // Keywords
-    FUNCDEF_TOK, // "def"
-    VAR_TOK,     // "var"
+    INT_TOK, // "int"
+    VAR_TOK, // "var"
 
     // Others
     IDENT_TOK, // identifier: [a-zA-Z][a-zA-Z0-9]*
@@ -42,5 +46,9 @@ extern char token_id[IDENTIFIER_MAX_LENGTH]; // store identifier for id token
 // Reads chars from stdin with a look-ahead of 1 and updates the state
 // of the variables defined above. If non suitable is found, an error is thrown.
 void get_next_token();
+
+// Initialises the lexer by setting the correctenteral state,
+// including the file to be read
+void init_lexer(FILE *src);
 
 #endif

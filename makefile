@@ -28,7 +28,7 @@ LDLIBS   :=  # Left empty if no libs are needed
 all: $(COMPILER_EXE)
 	./$(COMPILER_EXE) < test/program
 
-test: $(TESTER_EXE)
+test: clean $(TESTER_EXE)
 	./$(TESTER_EXE) test/parse_tests
 
 # Linking of object files
