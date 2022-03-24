@@ -1,0 +1,7 @@
+BinaryExpr: +
+    ConstExpr: 6
+    BinaryExpr: -
+        BinaryExpr: *
+            ConstExpr: 5
+            ConstExpr: 7
+        VarUseExpr: test

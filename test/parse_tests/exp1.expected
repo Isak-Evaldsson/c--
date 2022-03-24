@@ -1,0 +1,3 @@
+BinaryExpr: +
+    ConstExpr: 6
+    ConstExpr: 31
