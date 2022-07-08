@@ -6,11 +6,11 @@
 #include <string.h>
 #include <sys/types.h>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    DIR* FD;
-    struct dirent* in_file;
-    FILE* out_file;
+    DIR *FD;
+    struct dirent *in_file;
+    FILE *out_file;
 
     char file_path[500];
     char diff_comand[500] = "diff ";
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     // Reads parse test folder
     if (NULL == (FD = opendir(argv[1]))) {
         fprintf(stderr, "Error : Failed to open input directory - %s\n",
-            strerror(errno));
+                strerror(errno));
         return 1;
     }
 
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         strcat(file_path, "/");
         strcat(file_path, in_file->d_name);
 
-        AST_prototype* ast = parse(file_path);
+        AST_func_list *ast = parse(file_path);
 
         if (ast != NULL) {
             // Create out-file
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
             out_file = fopen(file_path, "w+");
 
             // Write ast to out-file
-            print_proto(ast, out_file);
+            print_func_list(ast, out_file);
             fclose(out_file);
 
             // Building command 'diff out_file expected_file'

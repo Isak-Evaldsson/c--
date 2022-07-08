@@ -5,10 +5,10 @@
 #include "parser.h"
 #include "util.h"
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    char* file_name;
-    AST_prototype* proto;
+    char *file_name;
+    AST_func_list *ast;
 
     if (argc != 2) {
         fprintf(stderr, "usage: %s filename\n", argv[0]);
@@ -17,11 +17,11 @@ int main(int argc, char** argv)
 
     file_name = argv[1];
 
-    if (!(proto = parse(file_name))) {
+    if (!(ast = parse(file_name))) {
         exit(1);
     }
 
     printf("Compilation successful\n");
-    print_proto(proto, stdout);
+    print_func_list(ast, stdout);
     return 0;
 }

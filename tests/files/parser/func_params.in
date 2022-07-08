@@ -1,0 +1,3 @@
+int test_param_1() {}
+int test_param_2(int a) {}
+int test_param_3(int a, int b, int c) {}
