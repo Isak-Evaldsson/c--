@@ -30,8 +30,9 @@ ID [a-zA][a-zA-Z0-9_]*
 \n	        { adjust(); EM_newline(); continue; }
 "("	        { adjust(); return LPAREN; }
 ")"	        { adjust(); return RPAREN; }
-";"         { adjust(); return SEMI; }   
+";"         { adjust(); return SEMI; }
+","         { adjust(); return COMMA; }
 "int"  	    { adjust(); return INT; }
 {ID}        { adjust(); yylval.sval=strdup(yytext); return ID; }
-.	        { adjust(); EM_error(EM_tokPos,"illegal token '%s'", yytext); }
+.	        { adjust(); EM_error(EM_tokPos,"illegal token '%s'", yytext); yyterminate(); }
 %%

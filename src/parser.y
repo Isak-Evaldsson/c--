@@ -32,11 +32,11 @@ void yyerror(char *s)
 %token  INT
         LPAREN 
         RPAREN
-        SEMI       
-
+        SEMI
+        COMMA       
 
 %type <proto> prototype
-%type <param> param_list
+%type <param> param_list param_list2
 %type <sval>  param
 
 %start program
@@ -47,7 +47,12 @@ program: prototype { ast_root = $1; }
 prototype: INT ID LPAREN param_list RPAREN SEMI { $$ = create_prototype_ast($2, $4); }
 
 param_list:
-    /* epsiolon */      { $$ = NULL; }
-    | param param_list  { $$ = create_param_list($1, $2); }
+    /* epsiolon */              { $$ = NULL; }
+    | param                     { $$ = create_param_list($1, NULL); }
+    | param COMMA param_list2   { $$ = create_param_list($1, $3); }
+
+param_list2:        
+    param                       { $$ = create_param_list($1, NULL); }
+    | param COMMA param_list2   { $$ = create_param_list($1, $3); }
 
 param: INT ID           { $$ = $2; }
