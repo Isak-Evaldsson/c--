@@ -1,8 +1,7 @@
-#ifndef PARSER_HEADER
-#define PARSER_HEADER
-#include <ast.h>
+#include "ast.h"
 
-// Parses file from stdin and retruns if it was successful or not
-expr_ast *parse();
-
-#endif
+/**
+ *  Wrapper function around the bison parser.
+ *  @returns Pointer to the ast root node, if parsing fails NULL is returned
+ */
+AST_prototype* parse(char* file_name);

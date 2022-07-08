@@ -1,35 +1,51 @@
+/*
+ * util.c - commonly used utility functions.
+ */
+
+#include "util.h"
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/** Utility function for printing formated error messages.
-    @param type used to specify which type of error it is, e.g. Lexer error
-    @param fmt provides error details, fromated string that works like printf
-*/
-void error(char *type, const char *fmt, ...)
+void error(const char *fmt, ...)
 {
-    va_list ap;
+    va_list args;
     char buf[BUFSIZ];
 
-    // Creates formated string in buf
-    va_start(ap, fmt);
-    vsprintf(buf, fmt, ap);
+    va_start(args, fmt);
+    vsnprintf(buf, BUFSIZ, fmt, args);
 
-    // Prints buffer and exits with error
-    fprintf(stderr, "%s: %s\n", type, buf);
+    fprintf(stderr, "error: %s\n", buf);
     exit(1);
 }
 
-/**
- * @brief Allcaties a new string and copies the contents of the supplied string.
- *
- * @param string the string to copy
- * @return char*
- */
-char *copy_str(char *string)
+void *xmalloc(size_t s)
 {
-    char *t = calloc(sizeof(char), strlen(string) + 1);
-    strcpy(t, string);
-    return t;
+    void *p = malloc(s);
+
+    if (p == NULL)
+        error("out of memory: malloc(%zu) failed", s);
+
+    return p;
+}
+
+char *strdup(const char *src)
+{
+// Making sure the strdup function wont compile if c2x or above
+#if __STDC_VERSION > 201710L
+#error("replace strdup implementation with the libc version")
+#endif
+    size_t len = strlen(src) + 1;
+    char *str = malloc(len);
+    strncpy(str, src, len);
+    return str;
+}
+
+bool_list *bool_list_create(bool value, bool_list *next)
+{
+    bool_list *list = xmalloc(sizeof(*next));
+    list->value = value;
+    list->next = next;
+    return list;
 }

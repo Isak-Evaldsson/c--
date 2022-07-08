@@ -1,29 +1,19 @@
-#ifndef UTIL_HEADER
-#define UTIL_HEADER
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
 
-#define PRINT 1 // enable/disable prints.
+void *xmalloc(size_t s);
+void error(const char *fmt, ...);
 
-#if PRINT
-#define pr(...)                       \
-    do                                \
-    {                                 \
-        fprintf(stderr, __VA_ARGS__); \
-    } while (0)
-#else
-#define pr(...) /* no effect at all */
-#endif
+// Custom implementation of the strdup function proposed in c2x
+//
+char *strdup(const char *src);
 
-/** Utility function for printing formated error messages.
-    @param type used to specify which type of error it is, e.g. Lexer error
-    @param fmt provides error details, fromated string that works like printf 
-*/
-void error(char *type, const char *fmt, ...);
+typedef struct bool_list bool_list;
+struct bool_list {
+    bool value;
+    bool_list *next;
+};
 
-/**
- * @brief Allcaties a new string and copies the contents of the supplied string.
- * 
- * @param string the string to copy
- * @return char* 
- */
-char *copy_str(char *string);
-#endif
+bool_list *bool_list_create(bool value, bool_list *next);

@@ -1,136 +1,32 @@
-#include <stdlib.h>
-#include <string.h>
 #include "ast.h"
 #include "util.h"
-#include "lexer.h"
 
-/* Creates different expressions depending of thief type, ignores used parmeters,
-    could be used directly or with the predefined macros */
-static expr_ast *create_expr(int type, int value, char op, char *identifier, expr_ast *left, expr_ast *right, expr_ast *parms)
+AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params)
 {
-    expr_ast *e = calloc(1, sizeof(expr_ast));
-    e->type = type;
-
-    switch (type)
-    {
-    case BINARY:
-        e->data.bin_exprs.left = left;
-        e->data.bin_exprs.right = right;
-        e->data.bin_exprs.op = op;
-        break;
-
-    case CONSTANT:
-        e->data.value = value;
-        break;
-
-    case VAR_USE:
-        // Make sure strings are copied
-        e->data.identifier = copy_str(identifier);
-        break;
-
-    case CALL:
-        e->data.call.params = parms;
-        e->data.call.nbr_params = value;
-        // Make sure strings are copied
-        e->data.call.callee = copy_str(identifier);
-    }
-
-    return e;
-}
-
-expr_ast *create_bin_expr(int op_token, expr_ast *left, expr_ast *right)
-{
-    char op;
-
-    switch (op_token)
-    {
-    case ADD_TOK:
-        op = '+';
-        break;
-
-    case SUB_TOK:
-        op = '-';
-        break;
-
-    case MUL_TOK:
-        op = '*';
-        break;
-
-    case LESS_TOK:
-        op = '<';
-        break;
-    default:
-        error("ast error", "invalid op_token type %d", op_token);
-        break;
-    }
-
-    return create_expr(BINARY, 0, op, NULL, left, right, NULL);
-}
-
-expr_ast *create_const_expr(int value)
-{
-    return create_expr(CONSTANT, value, 0, NULL, NULL, NULL, NULL);
-}
-
-expr_ast *create_var_expr(char *identifier)
-{
-    return create_expr(VAR_USE, 0, 0, identifier, NULL, NULL, NULL);
-}
-
-expr_ast *create_call_expr(char *callee, expr_ast *params, int nbr_params)
-{
-    return create_expr(CALL, nbr_params, 0, callee, NULL, NULL, params);
-}
-
-prototype_ast *create_prototype_ast(char *identifier, char **args, size_t n_args)
-{
-    prototype_ast *proto = calloc(1, sizeof(prototype_ast));
+    AST_prototype *proto = xmalloc(sizeof(AST_prototype));
     proto->identifier = identifier;
-    proto->args = args;
-    proto->n_args = n_args;
-
+    proto->params = params;
     return proto;
 }
 
-func_ast *create_func_ast(prototype_ast *prototype, expr_ast *body)
+AST_param_list *create_param_list(char *identifier, AST_param_list *next)
 {
-    func_ast *func = calloc(1, sizeof(func_ast));
-    func->prototype = prototype;
-    func->body = body;
-
-    return func;
+    AST_param_list *param = xmalloc(sizeof(AST_param_list));
+    param->identifier = identifier;
+    param->next = next;
+    return param;
 }
 
-void print(expr_ast *expr, int indent, FILE *fp)
+void print_proto(AST_prototype *proto, FILE *fp)
 {
-    for (int i = 0; i < indent * INDENT; i++)
-        fprintf(fp, " ");
+    AST_param_list *param;
 
-    switch (expr->type)
-    {
-    case BINARY:
-        fprintf(fp, "BinaryExpr: %c\n", expr->data.bin_exprs.op);
-        print(expr->data.bin_exprs.left, indent + 1, fp);
-        print(expr->data.bin_exprs.right, indent + 1, fp);
-        break;
+    fprintf(fp, "Prototype: %s\n", proto->identifier);
 
-    case CONSTANT:
-        fprintf(fp, "ConstExpr: %d\n", expr->data.value);
-        break;
+    for (param = proto->params; param != NULL; param = param->next) {
+        for (size_t i = 0; i < INDENT; i++)
+            fputc(' ', fp);
 
-    case VAR_USE:
-        fprintf(fp, "VarUseExpr: %s\n", expr->data.identifier);
-        break;
-
-    case CALL:
-        fprintf(fp, "CallExpr: %s, %d args\n", expr->data.call.callee, expr->data.call.nbr_params);
-        for (int i = 0; i < expr->data.call.nbr_params; i++)
-        {
-            print(expr->data.call.params + i, indent + 1, fp);
-        }
-        break;
-
-    default:
-        error("ast error", "expr of invalid type %d", expr->type);
+        fprintf(fp, "Param: %s\n", param->identifier);
     }
 }
