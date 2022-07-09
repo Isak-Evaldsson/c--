@@ -74,6 +74,64 @@ AST_expr *create_expr(expr_type type, int literal)
     return expr;
 }
 
+void free_func_list(AST_func_list *list)
+{
+    if (list->next)
+        free_func_list(list->next);
+
+    free_func_def(list->func_def);
+    free(list);
+}
+
+void free_func_def(AST_func_def *def)
+{
+    if (def->stmts)
+        free_stmt_list(def->stmts);
+
+    free_prototype(def->proto);
+    free(def);
+}
+
+void free_prototype(AST_prototype *proto)
+{
+    if (proto->params)
+        free_param_list(proto->params);
+
+    free(proto->identifier);
+    free(proto);
+}
+
+void free_param_list(AST_param_list *param)
+{
+    if (param->next)
+        free_param_list(param->next);
+
+    free(param->identifier);
+    free(param);
+}
+
+void free_stmt_list(AST_stmt_list *list)
+{
+    if (list->next)
+        free_stmt_list(list->next);
+
+    free_stmt(list->stmt);
+    free(list);
+}
+
+void free_stmt(AST_stmt *stmt)
+{
+    if (stmt->type == STMT_VAR_DECL) {
+        free(stmt->stmt.var_decl.identifier);
+
+        if (stmt->stmt.var_decl.expr)
+            free_expr(stmt->stmt.var_decl.expr);
+    }
+    free(stmt);
+}
+
+void free_expr(AST_expr *expr) { free(expr); }
+
 void print_proto(AST_prototype *proto, FILE *fp)
 {
     AST_param_list *param;

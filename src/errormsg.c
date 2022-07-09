@@ -4,11 +4,11 @@
  *
  */
 
+#include "errormsg.h"
+#include "util.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include "util.h"
-#include "errormsg.h"
 
 bool anyErrors = false;
 
@@ -19,8 +19,7 @@ int EM_tokPos = 0;
 
 extern FILE *yyin;
 
-typedef struct intList
-{
+typedef struct intList {
     int i;
     struct intList *rest;
 } IntList;
@@ -31,6 +30,13 @@ static IntList *intList(int i, IntList *rest)
     l->i = i;
     l->rest = rest;
     return l;
+}
+
+static void freeList(IntList *list)
+{
+    if (list->rest)
+        freeList(list->rest);
+    free(list);
 }
 
 static IntList *linePos = NULL;
@@ -48,8 +54,7 @@ void EM_error(int pos, char *message, ...)
     int num = lineNum;
 
     anyErrors = true;
-    while (lines && lines->i >= pos)
-    {
+    while (lines && lines->i >= pos) {
         lines = lines->rest;
         num--;
     }
@@ -71,9 +76,14 @@ void EM_reset(char *fname)
     lineNum = 1;
     linePos = intList(0, NULL);
     yyin = fopen(fname, "r");
-    if (!yyin)
-    {
+    if (!yyin) {
         EM_error(0, "cannot open");
         exit(1);
     }
+}
+
+void EM_free()
+{
+    if (linePos)
+        freeList(linePos);
 }

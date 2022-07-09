@@ -1,3 +1,4 @@
+#include "errormsg.h"
 #include "parser.h"
 #include <dirent.h>
 #include <errno.h>
@@ -70,12 +71,20 @@ int main(int argc, char **argv)
                 printf("%s - Failed\n", in_file->d_name);
             }
             diff_comand[5] = '\0';
+
+            // Make sure theres no memory leaks
+            free_func_list(ast);
         } else {
             printf("%s - Failed\n", in_file->d_name);
         }
 
         n++;
+
+        // Test cleanup
+        EM_free();
     }
+
+    closedir(FD);
 
     if (n_succ == n) {
         printf("Passed all the tests");

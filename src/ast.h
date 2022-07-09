@@ -24,6 +24,11 @@ struct AST_func_list {
     AST_func_list *next;
 };
 
+struct AST_func_def {
+    AST_prototype *proto;
+    AST_stmt_list *stmts;
+};
+
 struct AST_prototype {
     char *identifier;
     AST_param_list *params;
@@ -32,11 +37,6 @@ struct AST_prototype {
 struct AST_param_list {
     char *identifier;
     AST_param_list *next;
-};
-
-struct AST_func_def {
-    AST_prototype *proto;
-    AST_stmt_list *stmts;
 };
 
 struct AST_stmt_list {
@@ -69,6 +69,15 @@ AST_param_list *create_param_list(char *identifier, AST_param_list *next);
 AST_stmt_list *create_stmt_list(AST_stmt *stmt, AST_stmt_list *next);
 AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr);
 AST_expr *create_expr(expr_type type, int literal);
+
+/* Destructors */
+void free_func_list(AST_func_list *list);
+void free_func_def(AST_func_def *def);
+void free_prototype(AST_prototype *proto);
+void free_param_list(AST_param_list *param);
+void free_stmt_list(AST_stmt_list *list);
+void free_stmt(AST_stmt *stmt);
+void free_expr(AST_expr *expr);
 
 /* Prints functions */
 void print_func_list(AST_func_list *list, FILE *fp);

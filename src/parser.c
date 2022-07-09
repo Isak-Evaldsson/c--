@@ -4,11 +4,18 @@
 
 extern AST_func_list *ast_root;
 
+// Flex internals
+extern FILE *yyin;
+extern void yylex_destroy();
+
 AST_func_list *parse(char *file_name)
 {
     EM_reset(file_name);
-    if (yyparse() == 0)
-        return ast_root;
+    int error = yyparse();
 
-    return NULL;
+    // Flex cleanup
+    fclose(yyin);
+    yylex_destroy();
+
+    return (error == 0) ? ast_root : NULL;
 }

@@ -23,5 +23,8 @@ int main(int argc, char **argv)
 
     printf("Compilation successful\n");
     print_func_list(ast, stdout);
+
+    free_func_list(ast);
+    EM_free();
     return 0;
 }
