@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     int n_succ = 0;
 
     if (argc <= 1) {
-        printf("Usage: ./tester 'parse-tests-path'");
+        printf("Usage: %s 'parse-tests-path'", argv[0]);
         return 1;
     }
     printf("Perfroming unit test\n");
