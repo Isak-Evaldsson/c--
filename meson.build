@@ -29,13 +29,20 @@ src += lexer.process('src/scanner.flex')
 src += parser.process('src/parser.y')
 
 executable('compiler',
-    sources: [src, 'src/compiler.c']
+    sources: [src, 'src/compiler.c'],
+    include_directories: 'src',
 )
 
 # unit tests
 test_bin = executable('tests', 
     sources: ['tests/parse_tester.c', src],
-    include_directories: 'src'
+    include_directories: 'src',
+    c_args: [
+        '-fsanitize-recover=address',
+        '-fsanitize=address',
+        '-g'
+    ],
+    link_args: ['-lasan']
 )
 
 test('unit tests', test_bin, args: meson.current_source_dir() / 'tests/files/parser')
