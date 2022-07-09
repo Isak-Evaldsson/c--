@@ -11,7 +11,10 @@ lexer = generator(flex,
 
 parser = generator(bison,
                    output : ['@BASENAME@.tab.c', '@BASENAME@.tab.h'],
-                   arguments : ['@INPUT@', '--defines=@OUTPUT1@', '--output=@OUTPUT0@'])
+                   arguments : ['@INPUT@',
+                                '--defines=@OUTPUT1@',
+                                '--output=@OUTPUT0@',
+                                '-Wcounterexamples'])
 
 # Defining src files
 src = [
