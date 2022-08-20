@@ -2,7 +2,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+// Allocates memory exits program if allocation fails
 void *xmalloc(size_t s);
+
+// Prints message to stderr and exits program
 void error(const char *fmt, ...);
 
 // Custom implementation of the strdup function proposed in c2x
