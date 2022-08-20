@@ -32,3 +32,8 @@ Handwritten recursive decent parser
 
 ### Backend
 Is currently planned to be written in llvm.
+
+## TODO list:
+* Working compiler :-)
+* Up-to-date readme
+* Re-introduce handwritten parser and lexer
