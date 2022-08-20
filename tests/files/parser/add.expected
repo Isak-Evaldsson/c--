@@ -1,0 +1,5 @@
+Prototype: a
+    VarDecl: a
+        BinOpExpr: +
+            LiteralExpr: 1
+            LiteralExpr: 5

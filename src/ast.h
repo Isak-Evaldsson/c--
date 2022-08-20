@@ -16,7 +16,8 @@ typedef struct AST_stmt AST_stmt;
 typedef struct AST_expr AST_expr;
 
 typedef enum { STMT_VAR_DECL } stmt_type;
-typedef enum { EXPR_LITERAL } expr_type;
+typedef enum { EXPR_LITERAL, BIN_OP } expr_type;
+typedef enum { BINOP_PLUS, BINOP_MINUS, BINOP_DIV, BINOP_MUL } binop_type;
 
 /* Ast node definitions */
 struct AST_func_list {
@@ -58,6 +59,11 @@ struct AST_expr {
     expr_type type;
     union {
         int lit;
+        struct {
+            binop_type op;
+            AST_expr *left;
+            AST_expr *right;
+        } binop;
     } expr;
 };
 
@@ -68,7 +74,8 @@ AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params);
 AST_param_list *create_param_list(char *identifier, AST_param_list *next);
 AST_stmt_list *create_stmt_list(AST_stmt *stmt, AST_stmt_list *next);
 AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr);
-AST_expr *create_expr(expr_type type, int literal);
+AST_expr *create_literal_expr(expr_type type, int literal);
+AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right);
 
 /* Destructors */
 void free_func_list(AST_func_list *list);

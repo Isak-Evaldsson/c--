@@ -58,7 +58,7 @@ AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr)
     return stmt;
 }
 
-AST_expr *create_expr(expr_type type, int literal)
+AST_expr *create_literal_expr(expr_type type, int literal)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
 
@@ -71,6 +71,18 @@ AST_expr *create_expr(expr_type type, int literal)
         error("Invalid expr_type %d", type);
         break;
     }
+    return expr;
+}
+
+AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right)
+{
+    AST_expr *expr = xmalloc(sizeof(AST_expr));
+
+    expr->type = BIN_OP;
+    expr->expr.binop.op = type;
+    expr->expr.binop.left = left;
+    expr->expr.binop.right = right;
+
     return expr;
 }
 
@@ -130,7 +142,14 @@ void free_stmt(AST_stmt *stmt)
     free(stmt);
 }
 
-void free_expr(AST_expr *expr) { free(expr); }
+void free_expr(AST_expr *expr)
+{
+    if (expr->type == BIN_OP) {
+        free_expr(expr->expr.binop.left);
+        free_expr(expr->expr.binop.right);
+    }
+    free(expr);
+}
 
 void print_proto(AST_prototype *proto, FILE *fp)
 {
@@ -182,14 +201,44 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
     }
 }
 
+// Helper function converting a binop enum to a string representation
+static const char *binop2string(binop_type op)
+{
+    switch (op) {
+    case BINOP_PLUS:
+        return "+";
+
+    case BINOP_MINUS:
+        return "-";
+
+    case BINOP_DIV:
+        return "/";
+
+    case BINOP_MUL:
+        return "*";
+
+    default:
+        return "INVALID OPERATOR";
+    }
+}
+
 void print_expr(AST_expr *expr, int level, FILE *fp)
 {
+    const char *op_str;
+
     for (size_t i = 0; i < level * INDENT; i++)
         fputc(' ', fp);
 
     switch (expr->type) {
     case EXPR_LITERAL:
         fprintf(fp, "LiteralExpr: %d\n", expr->expr.lit);
+        break;
+    case BIN_OP:
+        op_str = binop2string(expr->expr.binop.op);
+
+        fprintf(fp, "BinOpExpr: %s\n", op_str);
+        print_expr(expr->expr.binop.left, level + 1, fp);
+        print_expr(expr->expr.binop.right, level + 1, fp);
         break;
     default:
         fprintf(fp, "UknownExpr: %d\n", expr->type);

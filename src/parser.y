@@ -11,11 +11,13 @@ int yylex(void);
 AST_func_list *ast_root;
 
 // Bison error handling function
-void yyerror(char *s)
+void yyerror(const char *s)
 {
     EM_error(EM_tokPos, "%s", s);
 }
 %}
+
+%define parse.error verbose
 
 %union {
         // Terminal types
@@ -34,7 +36,7 @@ void yyerror(char *s)
        }
 
 %token <sval> ID
-%token <ival> LITERAL
+%token <ival> INTEGER
 %token  INT
         LPAREN 
         RPAREN
@@ -42,7 +44,11 @@ void yyerror(char *s)
         COMMA
         LCURLY
         RCURLY
-        EQ       
+        EQ
+        PLUS
+        MINUS
+        MUL
+        DIV
 
 %type <proto> prototype
 %type <param> param_list param_list2
@@ -51,7 +57,7 @@ void yyerror(char *s)
 %type <func_def> func_defintion
 %type <stmts> stmt_list
 %type <stmt> statement
-%type <expr> expression
+%type <expr> expression term factor
 
 %start program
 
@@ -86,5 +92,16 @@ statement:
     INT ID SEMI                 { $$ = create_stmt(STMT_VAR_DECL, $2, NULL); }
     | INT ID EQ expression SEMI { $$ = create_stmt(STMT_VAR_DECL, $2, $4); }
 
+expression:
+    term
+    | expression PLUS term  { $$ = create_binary_expr(BINOP_PLUS, $1, $3); }
+    | expression MINUS term { $$ = create_binary_expr(BINOP_MINUS, $1, $3); }
 
-expression: LITERAL { $$ = create_expr(EXPR_LITERAL, $1); }
+term:
+    factor
+    | term MUL factor { $$ = create_binary_expr(BINOP_MUL, $1, $3); }
+    | term DIV factor { $$ = create_binary_expr(BINOP_DIV, $1, $3); }
+
+factor: 
+    LPAREN expression RPAREN { $$ = $2; }
+    | INTEGER { $$ = create_literal_expr(EXPR_LITERAL, $1); }

@@ -1,12 +1,10 @@
-int func1 () {
-    int a;
-}
-
-int func2 (int a) {
-    int b = 0;
-}
-
-int func3 () {
-    int c;
-    int d = 7;
-}
+Prototype: func1
+    VarDecl: a
+Prototype: func2
+    Param: a
+    VarDecl: b
+        LiteralExpr: 0
+Prototype: func3
+    VarDecl: c
+    VarDecl: d
+        LiteralExpr: 7

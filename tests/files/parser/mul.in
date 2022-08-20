@@ -1,0 +1,8 @@
+int a() {
+    // Both expressions shall be equivalent
+    int a = 3 - 2 * 2 / 6;
+    int b = 3 - ((2 * 2) / 6);
+
+    // However this shall not
+    int c = (3 - 2) * (2 / 6);
+}

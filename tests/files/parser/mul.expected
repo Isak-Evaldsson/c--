@@ -1,0 +1,25 @@
+Prototype: a
+    VarDecl: a
+        BinOpExpr: -
+            LiteralExpr: 3
+            BinOpExpr: /
+                BinOpExpr: *
+                    LiteralExpr: 2
+                    LiteralExpr: 2
+                LiteralExpr: 6
+    VarDecl: b
+        BinOpExpr: -
+            LiteralExpr: 3
+            BinOpExpr: /
+                BinOpExpr: *
+                    LiteralExpr: 2
+                    LiteralExpr: 2
+                LiteralExpr: 6
+    VarDecl: c
+        BinOpExpr: *
+            BinOpExpr: -
+                LiteralExpr: 3
+                LiteralExpr: 2
+            BinOpExpr: /
+                LiteralExpr: 2
+                LiteralExpr: 6
