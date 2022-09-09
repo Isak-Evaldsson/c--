@@ -1,0 +1,20 @@
+Prototype: func
+    VarDecl: a
+        FunCallExpr: func1
+    VarDecl: b
+        FunCallExpr: func2
+            LiteralExpr: 1
+    VarDecl: c
+        FunCallExpr: func3
+            VarUseExpr: a
+            VarUseExpr: b
+            LiteralExpr: 1
+    VarDecl: d
+        BinOpExpr: +
+            BinOpExpr: *
+                LiteralExpr: 5
+                FunCallExpr: func
+                    BinOpExpr: +
+                        LiteralExpr: 1
+                        LiteralExpr: 1
+            LiteralExpr: 1

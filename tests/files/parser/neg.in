@@ -1,0 +1,5 @@
+int test() {
+    int a = -1;
+    int b = -8 * 2;
+    int c = -(8 * 2);   
+}

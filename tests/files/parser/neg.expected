@@ -1,0 +1,14 @@
+Prototype: test
+    VarDecl: a
+        NegationExpr: 
+            LiteralExpr: 1
+    VarDecl: b
+        BinOpExpr: *
+            NegationExpr: 
+                LiteralExpr: 8
+            LiteralExpr: 2
+    VarDecl: c
+        NegationExpr: 
+            BinOpExpr: *
+                LiteralExpr: 8
+                LiteralExpr: 2

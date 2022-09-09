@@ -1,0 +1,5 @@
+Prototype: func1
+    VarDecl: a
+        LiteralExpr: 1
+    VarDecl: b
+        VarUseExpr: a

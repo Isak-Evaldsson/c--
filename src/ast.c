@@ -78,12 +78,53 @@ AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
 
-    expr->type = BIN_OP;
+    expr->type = EXPR_BIN_OP;
     expr->expr.binop.op = type;
     expr->expr.binop.left = left;
     expr->expr.binop.right = right;
 
     return expr;
+}
+
+AST_expr *create_var_use_expr(char *var)
+{
+    AST_expr *expr = xmalloc(sizeof(AST_expr));
+
+    expr->type = EXPR_VAR_USE;
+    expr->expr.var = var;
+    return expr;
+};
+
+AST_expr *create_neg_expr(AST_expr *unary)
+{
+    AST_expr *expr = xmalloc(sizeof(AST_expr));
+
+    expr->type = EXPR_NEG;
+    expr->expr.unary = unary;
+    return expr;
+}
+
+AST_expr *create_func_call_expr(char *identifier, AST_expr_list *args)
+{
+    AST_expr *expr = xmalloc(sizeof(AST_expr));
+    AST_func_call *call = xmalloc(sizeof(AST_func_call));
+
+    call->identifier = identifier;
+    call->args = args;
+
+    expr->type = EXPR_FUNC_CALL;
+    expr->expr.call = call;
+
+    return expr;
+}
+
+AST_expr_list *create_expr_list(AST_expr *expr, AST_expr_list *next)
+{
+    AST_expr_list *list = xmalloc(sizeof(AST_expr_list));
+
+    list->expr = expr;
+    list->next = next;
+    return list;
 }
 
 void free_func_list(AST_func_list *list)
@@ -142,11 +183,47 @@ void free_stmt(AST_stmt *stmt)
     free(stmt);
 }
 
+void free_expr_list(AST_expr_list *list)
+{
+    if (list->next)
+        free_expr_list(list->next);
+
+    free_expr(list->expr);
+    free(list);
+}
+
+void free_func_call(AST_func_call *call)
+{
+    if (call->args)
+        free_expr_list(call->args);
+
+    free(call->identifier);
+    free(call);
+}
+
 void free_expr(AST_expr *expr)
 {
-    if (expr->type == BIN_OP) {
+    switch (expr->type) {
+    case EXPR_BIN_OP:
         free_expr(expr->expr.binop.left);
         free_expr(expr->expr.binop.right);
+        break;
+
+    case EXPR_VAR_USE:
+        free(expr->expr.var);
+        break;
+
+    case EXPR_NEG:
+        free_expr(expr->expr.unary);
+        break;
+
+    case EXPR_FUNC_CALL:
+        free_func_call(expr->expr.call);
+        break;
+
+    default:
+        /* No alloced members */
+        break;
     }
     free(expr);
 }
@@ -201,6 +278,15 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
     }
 }
 
+void print_expr_list(AST_expr_list *list, int level, FILE *fp)
+{
+    AST_expr_list *entry;
+
+    for (entry = list; entry != NULL; entry = entry->next) {
+        print_expr(entry->expr, level, fp);
+    }
+}
+
 // Helper function converting a binop enum to a string representation
 static const char *binop2string(binop_type op)
 {
@@ -233,13 +319,29 @@ void print_expr(AST_expr *expr, int level, FILE *fp)
     case EXPR_LITERAL:
         fprintf(fp, "LiteralExpr: %d\n", expr->expr.lit);
         break;
-    case BIN_OP:
+
+    case EXPR_BIN_OP:
         op_str = binop2string(expr->expr.binop.op);
 
         fprintf(fp, "BinOpExpr: %s\n", op_str);
         print_expr(expr->expr.binop.left, level + 1, fp);
         print_expr(expr->expr.binop.right, level + 1, fp);
         break;
+
+    case EXPR_VAR_USE:
+        fprintf(fp, "VarUseExpr: %s\n", expr->expr.var);
+        break;
+
+    case EXPR_NEG:
+        fprintf(fp, "NegationExpr: \n");
+        print_expr(expr->expr.unary, level + 1, fp);
+        break;
+
+    case EXPR_FUNC_CALL:
+        fprintf(fp, "FunCallExpr: %s\n", expr->expr.call->identifier);
+        print_expr_list(expr->expr.call->args, level + 1, fp);
+        break;
+
     default:
         fprintf(fp, "UknownExpr: %d\n", expr->type);
         break;

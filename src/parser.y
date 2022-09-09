@@ -32,6 +32,7 @@ void yyerror(const char *s)
         AST_param_list *param;
         AST_stmt_list *stmts;
         AST_stmt *stmt;
+        AST_expr_list *exprs;
         AST_expr *expr;
        }
 
@@ -57,7 +58,8 @@ void yyerror(const char *s)
 %type <func_def> func_defintion
 %type <stmts> stmt_list
 %type <stmt> statement
-%type <expr> expression term factor
+%type <exprs> arg_list arg_list2
+%type <expr> expression term factor func_call
 
 %start program
 
@@ -92,6 +94,18 @@ statement:
     INT ID SEMI                 { $$ = create_stmt(STMT_VAR_DECL, $2, NULL); }
     | INT ID EQ expression SEMI { $$ = create_stmt(STMT_VAR_DECL, $2, $4); }
 
+func_call: ID LPAREN arg_list RPAREN { $$ = create_func_call_expr($1, $3); }
+
+arg_list:
+    /* epsiolon */               { $$ = NULL; }
+    | expression                 { $$ = create_expr_list($1, NULL); }
+    | expression COMMA arg_list2 { $$ = create_expr_list($1, $3); }
+
+arg_list2:        
+    expression                   { $$ = create_expr_list($1, NULL); }
+    | expression COMMA arg_list2 { $$ = create_expr_list($1, $3); }
+
+
 expression:
     term
     | expression PLUS term  { $$ = create_binary_expr(BINOP_PLUS, $1, $3); }
@@ -104,4 +118,7 @@ term:
 
 factor: 
     LPAREN expression RPAREN { $$ = $2; }
-    | INTEGER { $$ = create_literal_expr(EXPR_LITERAL, $1); }
+    | INTEGER                { $$ = create_literal_expr(EXPR_LITERAL, $1); }
+    | ID                     { $$ = create_var_use_expr($1); }
+    | MINUS factor           { $$ = create_neg_expr($2); }
+    | func_call

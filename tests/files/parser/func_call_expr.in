@@ -1,0 +1,9 @@
+int func() {
+    // Check correct parameter list
+    int a = func1();
+    int b = func2(1);
+    int c = func3(a, b, 1);
+
+    // Check correct order in tree
+    int d = 5 * func(1 + 1) + 1;
+}
