@@ -1,0 +1,14 @@
+int func1() {
+    // Empty
+    while (1) {}
+
+    // Block
+    while (1) {
+        int a;
+        print();
+    }
+
+    // No-Block
+    while(1)
+        return 1;
+}

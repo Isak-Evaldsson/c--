@@ -1,0 +1,5 @@
+int func() {
+    func1();
+    func2(1);
+    func3(a, b, 1);
+}

@@ -50,11 +50,40 @@ AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr)
         stmt->stmt.var_decl.expr = expr;
         stmt->stmt.var_decl.identifier = identifier;
         break;
+    case STMT_ASSIGN:
+        stmt->stmt.var_decl.expr = expr;
+        stmt->stmt.var_decl.identifier = identifier;
+        break;
+
+    case STMT_RETURN:
+        stmt->stmt.ret_expr = expr;
+        break;
 
     default:
         error("Invalid stmt_type %d", type);
         break;
     }
+    return stmt;
+}
+
+AST_stmt *create_while_stmt(AST_expr *pred, AST_stmt_list *block)
+{
+    AST_stmt *stmt = xmalloc(sizeof(AST_stmt));
+
+    stmt->type = STMT_WHILE;
+    stmt->stmt.loop.pred = pred;
+    stmt->stmt.loop.block = block;
+
+    return stmt;
+}
+
+AST_stmt *create_func_call_stmt(AST_func_call *call)
+{
+    AST_stmt *stmt = xmalloc(sizeof(AST_stmt));
+
+    stmt->stmt.func_call = call;
+    stmt->type = STMT_FUNC_CALL;
+
     return stmt;
 }
 
@@ -104,13 +133,19 @@ AST_expr *create_neg_expr(AST_expr *unary)
     return expr;
 }
 
-AST_expr *create_func_call_expr(char *identifier, AST_expr_list *args)
+AST_func_call *create_func_call(char *identifier, AST_expr_list *args)
 {
-    AST_expr *expr = xmalloc(sizeof(AST_expr));
     AST_func_call *call = xmalloc(sizeof(AST_func_call));
 
     call->identifier = identifier;
     call->args = args;
+
+    return call;
+}
+
+AST_expr *create_func_call_expr(AST_func_call *call)
+{
+    AST_expr *expr = xmalloc(sizeof(AST_expr));
 
     expr->type = EXPR_FUNC_CALL;
     expr->expr.call = call;
@@ -165,6 +200,9 @@ void free_param_list(AST_param_list *param)
 
 void free_stmt_list(AST_stmt_list *list)
 {
+    if (list == NULL)
+        return;
+
     if (list->next)
         free_stmt_list(list->next);
 
@@ -174,12 +212,31 @@ void free_stmt_list(AST_stmt_list *list)
 
 void free_stmt(AST_stmt *stmt)
 {
-    if (stmt->type == STMT_VAR_DECL) {
+    switch (stmt->type) {
+    case STMT_VAR_DECL:
+    case STMT_ASSIGN:
         free(stmt->stmt.var_decl.identifier);
 
         if (stmt->stmt.var_decl.expr)
             free_expr(stmt->stmt.var_decl.expr);
+        break;
+
+    case STMT_FUNC_CALL:
+        free_func_call(stmt->stmt.func_call);
+        break;
+
+    case STMT_RETURN:
+        free_expr(stmt->stmt.ret_expr);
+        break;
+
+    case STMT_WHILE:
+        free_expr(stmt->stmt.loop.pred);
+        free_stmt_list(stmt->stmt.loop.block);
+
+    default:
+        break;
     }
+
     free(stmt);
 }
 
@@ -272,6 +329,33 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
             print_expr(stmt->stmt.var_decl.expr, level + 1, fp);
         }
         break;
+
+    case STMT_ASSIGN:
+        fprintf(fp, "Assignment: %s\n", stmt->stmt.var_decl.identifier);
+        print_expr(stmt->stmt.var_decl.expr, level + 1, fp);
+        break;
+
+    case STMT_FUNC_CALL:
+        fprintf(fp, "FunCall: %s\n", stmt->stmt.func_call->identifier);
+        print_expr_list(stmt->stmt.func_call->args, level + 1, fp);
+        break;
+
+    case STMT_RETURN:
+        fprintf(fp, "Return \n");
+        print_expr(stmt->stmt.ret_expr, level + 1, fp);
+        break;
+
+    case STMT_WHILE:
+        fprintf(fp, "While:\n");
+        print_expr(stmt->stmt.loop.pred, level + 1, fp);
+
+        for (size_t i = 0; i < level * INDENT; i++)
+            fputc(' ', fp);
+
+        fprintf(fp, "Do:\n");
+        print_stmt_list(stmt->stmt.loop.block, level + 1, fp);
+        break;
+
     default:
         fprintf(fp, "UknownStmt: %d\n", stmt->type);
         break;

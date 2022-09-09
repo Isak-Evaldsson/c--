@@ -1,0 +1,14 @@
+Prototype: func1
+    While:
+        LiteralExpr: 1
+    Do:
+    While:
+        LiteralExpr: 1
+    Do:
+        VarDecl: a
+        FunCall: print
+    While:
+        LiteralExpr: 1
+    Do:
+        Return 
+            LiteralExpr: 1

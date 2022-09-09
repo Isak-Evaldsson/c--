@@ -1,0 +1,8 @@
+Prototype: func
+    FunCall: func1
+    FunCall: func2
+        LiteralExpr: 1
+    FunCall: func3
+        VarUseExpr: a
+        VarUseExpr: b
+        LiteralExpr: 1

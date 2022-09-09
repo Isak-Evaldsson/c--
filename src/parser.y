@@ -34,6 +34,7 @@ void yyerror(const char *s)
         AST_stmt *stmt;
         AST_expr_list *exprs;
         AST_expr *expr;
+        AST_func_call *call;
        }
 
 %token <sval> ID
@@ -50,6 +51,8 @@ void yyerror(const char *s)
         MINUS
         MUL
         DIV
+        RETURN
+        WHILE
 
 %type <proto> prototype
 %type <param> param_list param_list2
@@ -57,9 +60,10 @@ void yyerror(const char *s)
 %type <funcs> func_list
 %type <func_def> func_defintion
 %type <stmts> stmt_list
-%type <stmt> statement
+%type <stmt> statement while_stmt return_stmt
 %type <exprs> arg_list arg_list2
-%type <expr> expression term factor func_call
+%type <expr> expression term factor
+%type <call> func_call
 
 %start program
 
@@ -93,8 +97,18 @@ stmt_list:
 statement: 
     INT ID SEMI                 { $$ = create_stmt(STMT_VAR_DECL, $2, NULL); }
     | INT ID EQ expression SEMI { $$ = create_stmt(STMT_VAR_DECL, $2, $4); }
+    | ID EQ expression SEMI     { $$ = create_stmt(STMT_ASSIGN, $1, $3); }
+    | func_call SEMI            { $$ = create_func_call_stmt($1); }
+    | return_stmt
+    | while_stmt
+    
+return_stmt: RETURN expression SEMI { $$ = create_stmt(STMT_RETURN, NULL, $2); }
 
-func_call: ID LPAREN arg_list RPAREN { $$ = create_func_call_expr($1, $3); }
+while_stmt:
+    WHILE LPAREN expression RPAREN LCURLY stmt_list RCURLY { $$ = create_while_stmt($3, $6); }
+    | WHILE LPAREN expression RPAREN statement             { $$ = create_while_stmt($3, create_stmt_list($5, NULL)); }
+
+func_call: ID LPAREN arg_list RPAREN { $$ = create_func_call($1, $3); }
 
 arg_list:
     /* epsiolon */               { $$ = NULL; }
@@ -104,7 +118,6 @@ arg_list:
 arg_list2:        
     expression                   { $$ = create_expr_list($1, NULL); }
     | expression COMMA arg_list2 { $$ = create_expr_list($1, $3); }
-
 
 expression:
     term
@@ -121,4 +134,4 @@ factor:
     | INTEGER                { $$ = create_literal_expr(EXPR_LITERAL, $1); }
     | ID                     { $$ = create_var_use_expr($1); }
     | MINUS factor           { $$ = create_neg_expr($2); }
-    | func_call
+    | func_call              { $$ = create_func_call_expr($1); }
