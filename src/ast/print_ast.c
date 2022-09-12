@@ -73,6 +73,26 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
         print_stmt_list(stmt->stmt.loop.block, level + 1, fp);
         break;
 
+    case STMT_IF:
+        fprintf(fp, "If:\n");
+        print_expr(stmt->stmt.if_stmt.pred, level + 1, fp);
+
+        for (size_t i = 0; i < level * INDENT; i++)
+            fputc(' ', fp);
+
+        fprintf(fp, "Do:\n");
+        print_stmt_list(stmt->stmt.if_stmt.block, level + 1, fp);
+
+        // Print optional else
+        if (stmt->stmt.if_stmt.else_block != NULL) {
+            for (size_t i = 0; i < level * INDENT; i++)
+                fputc(' ', fp);
+
+            fprintf(fp, "Else:\n");
+            print_stmt_list(stmt->stmt.if_stmt.else_block, level + 1, fp);
+        }
+        break;
+
     default:
         fprintf(fp, "UknownStmt: %d\n", stmt->type);
         break;

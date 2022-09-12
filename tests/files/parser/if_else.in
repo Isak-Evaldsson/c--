@@ -1,0 +1,24 @@
+int test()
+{
+    if (1) {
+        print(1);
+    } else {
+        print(2);
+    }
+
+    if (1)
+        print(1);
+    else {
+        print(2);
+    }
+  
+    if (1) {
+        print(1);
+    } else
+        print(2);
+
+    if (1)
+        print(1);
+    else
+        print(2);
+}

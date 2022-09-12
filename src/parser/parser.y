@@ -53,14 +53,16 @@ void yyerror(const char *s)
         DIV
         RETURN
         WHILE
+        IF
+        ELSE
 
 %type <proto> prototype
 %type <param> param_list param_list2
 %type <sval>  param
 %type <funcs> func_list
 %type <func_def> func_defintion
-%type <stmts> stmt_list
-%type <stmt> statement while_stmt return_stmt
+%type <stmts> stmt_list block opt_else
+%type <stmt> statement while_stmt return_stmt if_stmt
 %type <exprs> arg_list arg_list2
 %type <expr> expression term factor
 %type <call> func_call
@@ -91,7 +93,7 @@ param_list2:
 param: INT ID           { $$ = $2; }
 
 stmt_list:
-    /* epsilon */               { $$ = NULL; }
+    /* epsilon */            { $$ = NULL; }
     | statement stmt_list    { $$ = create_stmt_list($1, $2); }
 
 statement: 
@@ -101,12 +103,21 @@ statement:
     | func_call SEMI            { $$ = create_func_call_stmt($1); }
     | return_stmt
     | while_stmt
+    | if_stmt
     
 return_stmt: RETURN expression SEMI { $$ = create_stmt(STMT_RETURN, NULL, $2); }
 
-while_stmt:
-    WHILE LPAREN expression RPAREN LCURLY stmt_list RCURLY { $$ = create_while_stmt($3, $6); }
-    | WHILE LPAREN expression RPAREN statement             { $$ = create_while_stmt($3, create_stmt_list($5, NULL)); }
+while_stmt: WHILE LPAREN expression RPAREN block { $$ = create_while_stmt($3, $5); }
+
+if_stmt: IF LPAREN expression RPAREN block opt_else { $$ = create_if_stmt($3, $5, $6); }
+
+opt_else:
+    /* epsilon */ { $$ = NULL; }
+    | ELSE block  { $$ = $2; }
+
+block:
+    LCURLY stmt_list RCURLY { $$ = $2; }
+    | statement             { $$ = create_stmt_list($1, NULL); }
 
 func_call: ID LPAREN arg_list RPAREN { $$ = create_func_call($1, $3); }
 

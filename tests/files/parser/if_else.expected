@@ -1,0 +1,33 @@
+Prototype: test
+    If:
+        LiteralExpr: 1
+    Do:
+        FunCall: print
+            LiteralExpr: 1
+    Else:
+        FunCall: print
+            LiteralExpr: 2
+    If:
+        LiteralExpr: 1
+    Do:
+        FunCall: print
+            LiteralExpr: 1
+    Else:
+        FunCall: print
+            LiteralExpr: 2
+    If:
+        LiteralExpr: 1
+    Do:
+        FunCall: print
+            LiteralExpr: 1
+    Else:
+        FunCall: print
+            LiteralExpr: 2
+    If:
+        LiteralExpr: 1
+    Do:
+        FunCall: print
+            LiteralExpr: 1
+    Else:
+        FunCall: print
+            LiteralExpr: 2

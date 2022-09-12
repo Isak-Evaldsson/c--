@@ -18,7 +18,8 @@ typedef enum {
     STMT_ASSIGN,
     STMT_FUNC_CALL,
     STMT_RETURN,
-    STMT_WHILE
+    STMT_WHILE,
+    STMT_IF
 } stmt_type;
 
 typedef enum {
@@ -70,6 +71,11 @@ struct AST_stmt {
             AST_expr *pred;
             AST_stmt_list *block;
         } loop;
+        struct {
+            AST_expr *pred;
+            AST_stmt_list *block;
+            AST_stmt_list *else_block;
+        } if_stmt;
     } stmt;
 };
 
@@ -107,6 +113,8 @@ AST_stmt_list *create_stmt_list(AST_stmt *stmt, AST_stmt_list *next);
 AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr);
 AST_stmt *create_while_stmt(AST_expr *pred, AST_stmt_list *block);
 AST_stmt *create_func_call_stmt(AST_func_call *call);
+AST_stmt *create_if_stmt(AST_expr *pred, AST_stmt_list *block,
+                         AST_stmt_list *else_block);
 AST_expr *create_func_call_expr(AST_func_call *call);
 AST_expr *create_literal_expr(expr_type type, int literal);
 AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right);

@@ -87,6 +87,19 @@ AST_stmt *create_func_call_stmt(AST_func_call *call)
     return stmt;
 }
 
+AST_stmt *create_if_stmt(AST_expr *pred, AST_stmt_list *block,
+                         AST_stmt_list *else_block)
+{
+    AST_stmt *stmt = xmalloc(sizeof(AST_stmt));
+
+    stmt->type = STMT_IF;
+    stmt->stmt.if_stmt.pred = pred;
+    stmt->stmt.if_stmt.block = block;
+    stmt->stmt.if_stmt.else_block = else_block;
+
+    return stmt;
+}
+
 AST_expr *create_literal_expr(expr_type type, int literal)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
@@ -232,6 +245,13 @@ void free_stmt(AST_stmt *stmt)
     case STMT_WHILE:
         free_expr(stmt->stmt.loop.pred);
         free_stmt_list(stmt->stmt.loop.block);
+        break;
+
+    case STMT_IF:
+        free_expr(stmt->stmt.if_stmt.pred);
+        free_stmt_list(stmt->stmt.if_stmt.block);
+        free_stmt_list(stmt->stmt.if_stmt.else_block);
+        break;
 
     default:
         break;
