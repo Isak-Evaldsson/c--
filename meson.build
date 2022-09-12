@@ -1,42 +1,25 @@
 project('mycompiler', 'c',
         default_options : ['c_std=c17'])
 
-# Defining lexer and parser generators
-flex  = find_program('flex')
-bison = find_program('bison')
+# src/include collecting all the src files
+src = []
+inc = []
 
-lexer = generator(flex,
-                  output : '@PLAINNAME@.yy.c',
-                  arguments : ['-o', '@OUTPUT@', '@INPUT@'])
-
-parser = generator(bison,
-                   output : ['@BASENAME@.tab.c', '@BASENAME@.tab.h'],
-                   arguments : ['@INPUT@',
-                                '--defines=@OUTPUT1@',
-                                '--output=@OUTPUT0@',
-                                '-Wcounterexamples'])
-
-# Defining src files
-src = [
-    'src/errormsg.c',
-    'src/util.c',
-    'src/ast.c',
-    'src/parser.c'
-]
-
-# Adding lexer/parser generator output
-src += lexer.process('src/scanner.flex')
-src += parser.process('src/parser.y')
+# subdirs adding src files
+subdir('src/ast')
+subdir('src/util')
+subdir('src/lexer')
+subdir('src/parser')
 
 executable('compiler',
     sources: [src, 'src/compiler.c'],
-    include_directories: 'src',
+    include_directories: inc,
 )
 
 # unit tests
 test_bin = executable('tests', 
     sources: ['tests/parse_tester.c', src],
-    include_directories: 'src',
+    include_directories: inc,
     c_args: [
         '-fsanitize-recover=address',
         '-fsanitize=address',
