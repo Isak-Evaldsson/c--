@@ -1,9 +1,5 @@
 #ifndef AST_HEADER
 #define AST_HEADER
-#include <stdio.h>
-
-/* Number of spaces for each indent level when printing ast */
-#define INDENT 4
 
 /* Typedef Ast nodes */
 typedef struct AST_func_list AST_func_list;
@@ -128,14 +124,6 @@ void free_stmt_list(AST_stmt_list *list);
 void free_stmt(AST_stmt *stmt);
 void free_expr_list(AST_expr_list *list);
 void free_expr(AST_expr *expr);
-
-/* Prints functions */
-void print_func_list(AST_func_list *list, FILE *fp);
-void print_proto(AST_prototype *func, FILE *fp);
-void print_stmt_list(AST_stmt_list *list, int level, FILE *fp);
-void print_stmt(AST_stmt *stmt, int level, FILE *fp);
-void print_expr_list(AST_expr_list *list, int level, FILE *fp);
-void print_expr(AST_expr *expr, int level, FILE *fp);
 void free_func_call(AST_func_call *call);
 
 #endif

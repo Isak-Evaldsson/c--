@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "errormsg.h"
 #include "parser.h"
+#include "print_ast.h"
 #include "util.h"
 
 int main(int argc, char **argv)

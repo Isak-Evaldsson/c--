@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "print_ast.h"
 
 /**
  *  Wrapper function around the bison parser.
