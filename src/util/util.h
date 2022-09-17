@@ -4,6 +4,7 @@
 
 // Allocates memory exits program if allocation fails
 void *xmalloc(size_t s);
+void *xcalloc(size_t s, size_t n);
 
 // Prints message to stderr and exits program
 void error(const char *fmt, ...);

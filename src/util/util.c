@@ -30,6 +30,16 @@ void *xmalloc(size_t s)
     return p;
 }
 
+void *xcalloc(size_t s, size_t n)
+{
+    void *p = calloc(s, n);
+
+    if (p == NULL)
+        error("out of memory: calloc(%zu) failed", s);
+
+    return p;
+}
+
 char *strdup(const char *src)
 {
 // Making sure the strdup function wont compile if c2x or above
