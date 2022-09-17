@@ -6,13 +6,13 @@ void print_proto(AST_prototype *proto, FILE *fp)
 {
     AST_param_list *param;
 
-    fprintf(fp, "Prototype: %s\n", proto->identifier);
+    fprintf(fp, "Prototype: %s\n", symbol_name(proto->identifier));
 
     for (param = proto->params; param != NULL; param = param->next) {
         for (size_t i = 0; i < INDENT; i++)
             fputc(' ', fp);
 
-        fprintf(fp, "Param: %s\n", param->identifier);
+        fprintf(fp, "Param: %s\n", symbol_name(param->identifier));
     }
 }
 
@@ -40,7 +40,8 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
 
     switch (stmt->type) {
     case STMT_VAR_DECL:
-        fprintf(fp, "VarDecl: %s\n", stmt->stmt.var_decl.identifier);
+        fprintf(fp, "VarDecl: %s\n",
+                symbol_name(stmt->stmt.var_decl.identifier));
 
         if (stmt->stmt.var_decl.expr) {
             print_expr(stmt->stmt.var_decl.expr, level + 1, fp);
@@ -48,12 +49,14 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
         break;
 
     case STMT_ASSIGN:
-        fprintf(fp, "Assignment: %s\n", stmt->stmt.var_decl.identifier);
+        fprintf(fp, "Assignment: %s\n",
+                symbol_name(stmt->stmt.var_decl.identifier));
         print_expr(stmt->stmt.var_decl.expr, level + 1, fp);
         break;
 
     case STMT_FUNC_CALL:
-        fprintf(fp, "FunCall: %s\n", stmt->stmt.func_call->identifier);
+        fprintf(fp, "FunCall: %s\n",
+                symbol_name(stmt->stmt.func_call->identifier));
         print_expr_list(stmt->stmt.func_call->args, level + 1, fp);
         break;
 
@@ -150,7 +153,7 @@ void print_expr(AST_expr *expr, int level, FILE *fp)
         break;
 
     case EXPR_VAR_USE:
-        fprintf(fp, "VarUseExpr: %s\n", expr->expr.var);
+        fprintf(fp, "VarUseExpr: %s\n", symbol_name(expr->expr.var));
         break;
 
     case EXPR_NEG:
@@ -159,7 +162,8 @@ void print_expr(AST_expr *expr, int level, FILE *fp)
         break;
 
     case EXPR_FUNC_CALL:
-        fprintf(fp, "FunCallExpr: %s\n", expr->expr.call->identifier);
+        fprintf(fp, "FunCallExpr: %s\n",
+                symbol_name(expr->expr.call->identifier));
         print_expr_list(expr->expr.call->args, level + 1, fp);
         break;
 

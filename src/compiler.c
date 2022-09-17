@@ -6,13 +6,26 @@
 #include "print_ast.h"
 #include "util.h"
 
+void print_help(const char *prog_name)
+{
+    fprintf(
+        stderr,
+        "Usage: %s <options> file\n"
+        "Option:\n"
+        "  -d <operation> Allows the compiler to perform debug operations:\n"
+        "     ast - dumps the abstract syntax tree after successful parsing\n"
+        "     analysis - exits compilation after performing semantic "
+        "analysis\n",
+        prog_name);
+}
+
 int main(int argc, char **argv)
 {
     char *file_name;
     AST_func_list *ast;
 
     if (argc != 2) {
-        fprintf(stderr, "usage: %s filename\n", argv[0]);
+        print_help(argv[0]);
         exit(1);
     }
 

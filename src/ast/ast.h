@@ -1,6 +1,8 @@
 #ifndef AST_HEADER
 #define AST_HEADER
 
+#include "symbol.h"
+
 /* Typedef Ast nodes */
 typedef struct AST_func_list AST_func_list;
 typedef struct AST_func_def AST_func_def;
@@ -44,12 +46,12 @@ struct AST_func_def {
 };
 
 struct AST_prototype {
-    char *identifier;
+    symbol_t *identifier;
     AST_param_list *params;
 };
 
 struct AST_param_list {
-    char *identifier;
+    symbol_t *identifier;
     AST_param_list *next;
 };
 
@@ -62,7 +64,7 @@ struct AST_stmt {
     stmt_type type;
     union {
         struct {
-            char *identifier;
+            symbol_t *identifier;
             AST_expr *expr;
         } var_decl;
         AST_func_call *func_call;
@@ -82,7 +84,7 @@ struct AST_stmt {
 struct AST_expr {
     expr_type type;
     union {
-        char *var;
+        symbol_t *var;
         int lit;
         struct {
             binop_type op;
@@ -95,7 +97,7 @@ struct AST_expr {
 };
 
 struct AST_func_call {
-    char *identifier;
+    symbol_t *identifier;
     AST_expr_list *args;
 };
 

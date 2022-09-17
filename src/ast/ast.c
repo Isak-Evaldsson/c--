@@ -20,7 +20,7 @@ AST_func_def *create_func_def(AST_prototype *proto, AST_stmt_list *stmts)
 AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params)
 {
     AST_prototype *proto = xmalloc(sizeof(AST_prototype));
-    proto->identifier = identifier;
+    proto->identifier = get_symbol(identifier);
     proto->params = params;
     return proto;
 }
@@ -28,7 +28,7 @@ AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params)
 AST_param_list *create_param_list(char *identifier, AST_param_list *next)
 {
     AST_param_list *param = xmalloc(sizeof(AST_param_list));
-    param->identifier = identifier;
+    param->identifier = get_symbol(identifier);
     param->next = next;
     return param;
 }
@@ -48,11 +48,11 @@ AST_stmt *create_stmt(stmt_type type, char *identifier, AST_expr *expr)
     switch (stmt->type = type) {
     case STMT_VAR_DECL:
         stmt->stmt.var_decl.expr = expr;
-        stmt->stmt.var_decl.identifier = identifier;
+        stmt->stmt.var_decl.identifier = get_symbol(identifier);
         break;
     case STMT_ASSIGN:
         stmt->stmt.var_decl.expr = expr;
-        stmt->stmt.var_decl.identifier = identifier;
+        stmt->stmt.var_decl.identifier = get_symbol(identifier);
         break;
 
     case STMT_RETURN:
@@ -133,7 +133,7 @@ AST_expr *create_var_use_expr(char *var)
     AST_expr *expr = xmalloc(sizeof(AST_expr));
 
     expr->type = EXPR_VAR_USE;
-    expr->expr.var = var;
+    expr->expr.var = get_symbol(var);
     return expr;
 };
 
@@ -150,7 +150,7 @@ AST_func_call *create_func_call(char *identifier, AST_expr_list *args)
 {
     AST_func_call *call = xmalloc(sizeof(AST_func_call));
 
-    call->identifier = identifier;
+    call->identifier = get_symbol(identifier);
     call->args = args;
 
     return call;
@@ -198,7 +198,6 @@ void free_prototype(AST_prototype *proto)
     if (proto->params)
         free_param_list(proto->params);
 
-    free(proto->identifier);
     free(proto);
 }
 
@@ -207,7 +206,6 @@ void free_param_list(AST_param_list *param)
     if (param->next)
         free_param_list(param->next);
 
-    free(param->identifier);
     free(param);
 }
 
@@ -228,8 +226,6 @@ void free_stmt(AST_stmt *stmt)
     switch (stmt->type) {
     case STMT_VAR_DECL:
     case STMT_ASSIGN:
-        free(stmt->stmt.var_decl.identifier);
-
         if (stmt->stmt.var_decl.expr)
             free_expr(stmt->stmt.var_decl.expr);
         break;
@@ -274,7 +270,6 @@ void free_func_call(AST_func_call *call)
     if (call->args)
         free_expr_list(call->args);
 
-    free(call->identifier);
     free(call);
 }
 
@@ -284,10 +279,6 @@ void free_expr(AST_expr *expr)
     case EXPR_BIN_OP:
         free_expr(expr->expr.binop.left);
         free_expr(expr->expr.binop.right);
-        break;
-
-    case EXPR_VAR_USE:
-        free(expr->expr.var);
         break;
 
     case EXPR_NEG:

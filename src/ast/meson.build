@@ -2,4 +2,4 @@
 inc += include_directories('.')
 
 # Add src files
-src += files('ast.c', 'print_ast.c')
+src += files('ast.c', 'print_ast.c', 'symbol.c')
