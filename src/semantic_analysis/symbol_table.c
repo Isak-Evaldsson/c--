@@ -1,14 +1,13 @@
-#include "hashset.h"
+#include "symbol_table.h"
+#include "hash_set.h"
 #include "symbol.h"
 
-typedef struct symboltable_t symboltable_t;
-
-struct symboltable_t {
-    symboltable_t *next;
+struct symbol_table_t {
+    symbol_table_t *next;
     hashset_t *symbols;
 };
 
-bool symboltable_lookup(symboltable_t *table, symbol_t *symbol)
+bool symbol_table_lookup(symbol_table_t *table, symbol_t *symbol)
 {
     // bottom of symboltable stack
     if (table->next == NULL)
@@ -18,7 +17,7 @@ bool symboltable_lookup(symboltable_t *table, symbol_t *symbol)
         || symboltable_lookup(table->next, symbol);
 }
 
-bool symboltable_declare(symboltable_t *table, symbol_t *symbol)
+bool symbol_table_add(symbol_table_t *table, symbol_t *symbol)
 {
     if (table->next == NULL)
         return false;
@@ -26,29 +25,29 @@ bool symboltable_declare(symboltable_t *table, symbol_t *symbol)
     return hashset_add(table->symbols, symbol);
 }
 
-symboltable_t *create_symboltable()
+symbol_table_t *create_symbol_table()
 {
-    symboltable_t *table = xmalloc(sizeof(symboltable_t));
+    symbol_table_t *table = xmalloc(sizeof(symbol_table_t));
     table->symbols = NULL;
     table->next = NULL;
 
     return table;
 }
 
-void symboltable_push(symboltable_t **table)
+void symbol_table_push(symbol_table_t **table)
 {
-    symboltable_t *head = create_symboltable();
+    symbol_table_t *head = create_symboltable();
 
     head->next = *table;
     head->symbols = create_hashset();
     *table = head;
 }
 
-void symboltable_free(symbol_t *table)
+void symbol_table_free(symbol_table_t *table)
 {
     if (table->next != NULL) {
         symboltable_free(table->next);
-        hashset_free(table->name);
+        hashset_free(table->symbols);
     }
     free(table);
 }

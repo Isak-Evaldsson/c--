@@ -1,7 +1,7 @@
 /*
     Generic hash table implementation using chaining
 */
-#include "hashset.h"
+#include "hash_set.h"
 #include "util.h"
 
 #define INITIAL_SIZE (10)

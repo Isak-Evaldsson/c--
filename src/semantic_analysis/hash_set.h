@@ -1,6 +1,9 @@
 /*
     Generic hash table implementation
 */
+#ifndef HASH_SET_HEADER
+#define HASH_SET_HEADER
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -17,3 +20,5 @@ bool hashset_contains(hashset_t *set, void *value);
 
 /* Frees hashset */
 void hashset_free(hashset_t *set);
+
+#endif
