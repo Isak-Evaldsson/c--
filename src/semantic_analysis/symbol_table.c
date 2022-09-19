@@ -1,6 +1,8 @@
 #include "symbol_table.h"
 #include "hash_set.h"
 #include "symbol.h"
+#include "util.h"
+#include <stdlib.h>
 
 struct symbol_table_t {
     symbol_table_t *next;
@@ -14,7 +16,7 @@ bool symbol_table_lookup(symbol_table_t *table, symbol_t *symbol)
         return false;
 
     return hashset_contains(table->symbols, symbol)
-        || symboltable_lookup(table->next, symbol);
+        || symbol_table_lookup(table->next, symbol);
 }
 
 bool symbol_table_add(symbol_table_t *table, symbol_t *symbol)
@@ -36,7 +38,7 @@ symbol_table_t *create_symbol_table()
 
 void symbol_table_push(symbol_table_t **table)
 {
-    symbol_table_t *head = create_symboltable();
+    symbol_table_t *head = create_symbol_table();
 
     head->next = *table;
     head->symbols = create_hashset();
@@ -46,7 +48,7 @@ void symbol_table_push(symbol_table_t **table)
 void symbol_table_free(symbol_table_t *table)
 {
     if (table->next != NULL) {
-        symboltable_free(table->next);
+        symbol_table_free(table->next);
         hashset_free(table->symbols);
     }
     free(table);

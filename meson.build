@@ -10,6 +10,7 @@ subdir('src/ast')
 subdir('src/util')
 subdir('src/lexer')
 subdir('src/parser')
+subdir('src/semantic_analysis')
 
 executable('compiler',
     sources: [src, 'src/compiler.c'],
