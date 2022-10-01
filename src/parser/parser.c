@@ -1,6 +1,8 @@
 #include "parser.h"
-#include "errormsg.h"
+#include "error_list.h"
 #include "parser.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 extern AST_func_list *ast_root;
 
@@ -10,7 +12,15 @@ extern void yylex_destroy();
 
 AST_func_list *parse(char *file_name)
 {
-    EM_reset(file_name);
+    error_list_init(file_name);
+
+    /* opening file */
+    yyin = fopen(file_name, "r");
+    if (!yyin) {
+        error_list_add(0, 0, "cannot open file");
+        return NULL;
+    }
+
     int error = yyparse();
 
     // Flex cleanup

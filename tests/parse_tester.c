@@ -1,4 +1,4 @@
-#include "errormsg.h"
+#include "error_list.h"
 #include "parser.h"
 #include <dirent.h>
 #include <errno.h>
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
         n++;
 
         // Test cleanup
-        EM_free();
+        error_list_free();
     }
 
     closedir(FD);

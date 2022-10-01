@@ -2,4 +2,4 @@
 inc += include_directories('.')
 
 # Add src files
-src += files('util.c', 'errormsg.c')
+src += files('util.c', 'error_list.c')

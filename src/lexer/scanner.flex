@@ -4,21 +4,32 @@
 #include "util.h"
 #include "ast.h"
 #include "parser.tab.h"
-#include "errormsg.h"
+#include "error_list.h"
+#include "parser.h"
 
-int charPos=1;
+int line_num=1;
+int line_pos=1;
+int token_pos = 1;
 
-int yywrap(void)
+int yywrap()
 {
-    charPos=1;
+    line_pos=1;
     return 1;
 }
 
-
-void adjust(void)
+void adjust()
 {
-    EM_tokPos=charPos;
-    charPos+=yyleng;
+    token_pos = line_pos + 1;
+    line_pos += yyleng;
+}
+
+void newline() {
+    line_num++;
+    line_pos = 0;
+}
+
+void token_error() {
+    error_list_add(line_num, line_pos, "illegal token '%s'", yytext); 
 }
 
 %}
@@ -30,7 +41,7 @@ INT [1-9][0-9]*|[0-9]
 %%
 "//".*      { /* Ignore comment */ }
 " "	        { adjust(); continue; }
-\n	        { adjust(); EM_newline(); continue; }
+\n	        { adjust(); newline(); continue; }
 "("	        { adjust(); return LPAREN; }
 ")"	        { adjust(); return RPAREN; }
 "{"	        { adjust(); return LCURLY; }
@@ -49,5 +60,5 @@ INT [1-9][0-9]*|[0-9]
 "/"  	    { adjust(); return DIV; }
 {INT}       { adjust(); yylval.ival=atoi(yytext); return INTEGER; }
 {ID}        { adjust(); yylval.sval=strdup(yytext); return ID; }
-.	        { adjust(); EM_error(EM_tokPos,"illegal token '%s'", yytext); yyterminate(); }
+.	        { adjust(); token_error(); yyterminate(); }
 %%

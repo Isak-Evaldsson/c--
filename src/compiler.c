@@ -1,5 +1,5 @@
 #include "ast.h"
-#include "errormsg.h"
+#include "error_list.h"
 #include "parser.h"
 #include "print_ast.h"
 #include "semantic_analysis.h"
@@ -55,6 +55,7 @@ int main(int argc, char **argv)
 
     // parse src file
     if (!(ast = parse(file_name))) {
+        error_list_print();
         exit(1);
     }
 
@@ -66,11 +67,15 @@ int main(int argc, char **argv)
     }
 
     // perform semantic analysis
-    name_analysis(ast);
+    if (!name_analysis(ast)) {
+        error_list_print();
+        exit(1);
+    };
+
     printf("Compilation successful\n");
 
 end:
     free_func_list(ast);
-    EM_free();
+    error_list_free();
     return 0;
 }
