@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "parser.h"
 #include "util.h"
 
 AST_func_list *create_func_list(AST_func_def *def, AST_func_list *next)
@@ -103,6 +104,7 @@ AST_stmt *create_if_stmt(AST_expr *pred, AST_stmt_list *block,
 AST_expr *create_literal_expr(expr_type type, int literal)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
+    set_token_data(&expr->token);
 
     switch (expr->type = type) {
     case EXPR_LITERAL:
@@ -119,6 +121,7 @@ AST_expr *create_literal_expr(expr_type type, int literal)
 AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
+    set_token_data(&left->token);
 
     expr->type = EXPR_BIN_OP;
     expr->expr.binop.op = type;
@@ -131,6 +134,7 @@ AST_expr *create_binary_expr(binop_type type, AST_expr *left, AST_expr *right)
 AST_expr *create_var_use_expr(char *var)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
+    set_token_data(&expr->token);
 
     expr->type = EXPR_VAR_USE;
     expr->expr.var = get_symbol(var);
@@ -140,6 +144,7 @@ AST_expr *create_var_use_expr(char *var)
 AST_expr *create_neg_expr(AST_expr *unary)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
+    set_token_data(&unary->token);
 
     expr->type = EXPR_NEG;
     expr->expr.unary = unary;
@@ -159,6 +164,7 @@ AST_func_call *create_func_call(char *identifier, AST_expr_list *args)
 AST_expr *create_func_call_expr(AST_func_call *call)
 {
     AST_expr *expr = xmalloc(sizeof(AST_expr));
+    set_token_data(&expr->token);
 
     expr->type = EXPR_FUNC_CALL;
     expr->expr.call = call;

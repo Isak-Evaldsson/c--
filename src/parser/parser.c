@@ -10,6 +10,12 @@ extern AST_func_list *ast_root;
 extern FILE *yyin;
 extern void yylex_destroy();
 
+void set_token_data(token_data_t *token)
+{
+    token->line_num = line_num;
+    token->line_pos = token_pos;
+};
+
 AST_func_list *parse(char *file_name)
 {
     error_list_init(file_name);

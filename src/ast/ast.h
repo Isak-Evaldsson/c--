@@ -34,6 +34,14 @@ typedef enum {
 
 typedef enum { BINOP_PLUS, BINOP_MINUS, BINOP_DIV, BINOP_MUL } binop_type;
 
+/* Struct containing token information */
+typedef struct token_data_t token_data_t;
+
+struct token_data_t {
+    int line_num;
+    int line_pos;
+};
+
 /* Ast node definitions */
 struct AST_func_list {
     AST_func_def *func_def;
@@ -82,6 +90,8 @@ struct AST_stmt {
 };
 
 struct AST_expr {
+    // token information, allowing better errors during name analysis
+    token_data_t token;
     expr_type type;
     union {
         symbol_t *var;
@@ -136,4 +146,4 @@ void free_expr_list(AST_expr_list *list);
 void free_expr(AST_expr *expr);
 void free_func_call(AST_func_call *call);
 
-#endif
+#endif /* AST_H */

@@ -11,7 +11,7 @@ int line_num=1;
 int line_pos=1;
 int token_pos = 1;
 
-int yywrap()
+int yywrap(void)
 {
     line_pos=1;
     return 1;
@@ -19,7 +19,7 @@ int yywrap()
 
 void adjust()
 {
-    token_pos = line_pos + 1;
+    token_pos = line_pos;
     line_pos += yyleng;
 }
 

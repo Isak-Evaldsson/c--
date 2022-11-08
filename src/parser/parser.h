@@ -1,13 +1,10 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include "ast.h"
 #include "print_ast.h"
 
-/* Struct containing token information */
-typedef struct token_data_t token_data_t;
-
-struct token_data_t {
-    int line_num;
-    int line_pos;
-};
+void set_token_data(token_data_t *token);
 
 /* File location from lexer */
 extern int line_num;
@@ -19,3 +16,5 @@ extern int token_pos;
  *  @returns Pointer to the ast root node, if parsing fails NULL is returned
  */
 AST_func_list *parse(char *file_name);
+
+#endif /* PARSER_H */
