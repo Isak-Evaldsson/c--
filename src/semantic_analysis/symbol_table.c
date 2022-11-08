@@ -36,13 +36,13 @@ symbol_table_t *create_symbol_table()
     return table;
 }
 
-void symbol_table_push(symbol_table_t **table)
+symbol_table_t *symbol_table_push(symbol_table_t *table)
 {
     symbol_table_t *head = create_symbol_table();
 
-    head->next = *table;
+    head->next = table;
     head->symbols = create_hashset();
-    *table = head;
+    return head;
 }
 
 void symbol_table_free(symbol_table_t *table)

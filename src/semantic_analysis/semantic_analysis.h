@@ -5,7 +5,8 @@
 #define SEMANTIC_ANALYSIS_H
 
 #include "ast.h"
+#include <stdbool.h>
 
-void name_analysis(AST_func_list *ast);
+bool name_analysis(AST_func_list *ast);
 
 #endif /* SEMANTIC_ANALYSIS_H */
