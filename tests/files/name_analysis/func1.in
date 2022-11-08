@@ -1,0 +1,7 @@
+int fail(int a) {
+    return b;
+}
+
+int succ(int a) {
+    return a;
+}

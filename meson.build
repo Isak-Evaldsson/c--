@@ -19,7 +19,7 @@ executable('compiler',
 
 # unit tests
 test_bin = executable('tests', 
-    sources: ['tests/parse_tester.c', src],
+    sources: ['tests/test_framework.c', 'tests/main.c', src],
     include_directories: inc,
     c_args: [
         '-fsanitize-recover=address',
@@ -29,4 +29,4 @@ test_bin = executable('tests',
     link_args: ['-lasan']
 )
 
-test('unit tests', test_bin, args: meson.current_source_dir() / 'tests/files/parser')
+test('unit tests', test_bin, args: meson.current_source_dir() / 'tests')
