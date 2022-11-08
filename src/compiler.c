@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
     // parse src file
     if (!(ast = parse(file_name))) {
-        error_list_print();
+        error_list_print(stderr, true);
         exit(1);
     }
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
     // perform semantic analysis
     if (!name_analysis(ast)) {
-        error_list_print();
+        error_list_print(stderr, true);
         exit(1);
     };
 
