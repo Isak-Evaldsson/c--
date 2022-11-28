@@ -47,14 +47,15 @@ symbol_table_t *symbol_table_push(symbol_table_t *table)
 
 void symbol_table_free(symbol_table_t *table)
 {
-    if (table == NULL) {
+    if (table == NULL)
         return;
-        if (table->next != NULL) {
-            symbol_table_free(table->next);
-            set_free(table->symbols);
-        }
 
+    if (table->next != NULL) {
         symbol_table_free(table->next);
-        hashset_free(table->symbols);
-        free(table);
+        set_free(table->symbols);
     }
+
+    symbol_table_free(table->next);
+    set_free(table->symbols);
+    free(table);
+}

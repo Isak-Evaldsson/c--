@@ -14,7 +14,7 @@ static void parse_test(FILE *out_file, char *path)
 
     print_ast(ast, out_file);
 
-    // Make sure theres no memory leaks
+    // Make sure there's no memory leaks
     free_ast_root(ast);
     free_symbols();
 }
