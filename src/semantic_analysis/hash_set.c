@@ -18,7 +18,7 @@ struct bucket_t {
 struct hashset_t {
     unsigned int size;
     unsigned int entries; /* allows table to grow when its to well-filled */
-    bucket_t **array
+    bucket_t **array;
 };
 
 /* creates new bucket and appends it to the next */
@@ -57,7 +57,7 @@ static void expand_table(hashset_t *set)
 {
     unsigned int new_size = 2 * set->size;
     bucket_t **old_array = set->array;
-    bucket_t **new_array = xcalloc(new_size, sizeof(bucket_t));
+    bucket_t **new_array = xcalloc(new_size, sizeof(bucket_t *));
 
     // re-balance table
     for (unsigned int i = 0; i < set->size; i++) {
@@ -66,7 +66,7 @@ static void expand_table(hashset_t *set)
         bucket_t *prev;
 
         if (b != NULL) {
-            new_index = (int)b % new_size;
+            new_index = (unsigned int)b % new_size;
             prev = new_array[new_index];
 
             // if prev list exits, prepend the new one
@@ -100,7 +100,7 @@ hashset_t *create_hashset()
 bool hashset_add(hashset_t *set, void *value)
 {
     int index = (int)value % set->size;
-    bucket_t *head = set->array + index;
+    bucket_t *head = set->array[index];
 
     // check if element already exits
     for (bucket_t *b = head; b != NULL; b = b->next) {
@@ -132,9 +132,13 @@ bool hashset_contains(hashset_t *set, void *value)
 
 void hashset_free(hashset_t *set)
 {
+    if (set == NULL) {
+        return;
+    }
+
     // frees buckets
     for (unsigned int i = 0; i < set->size; i++) {
-        free_bucket(set->array + i);
+        free_bucket(set->array[i]);
     }
     free(set);
 }

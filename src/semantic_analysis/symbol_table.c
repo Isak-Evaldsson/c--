@@ -7,6 +7,8 @@
 struct symbol_table_t {
     symbol_table_t *next;
     hashset_t *symbols;
+
+    symbol_table_t *parent;
 };
 
 bool symbol_table_lookup(symbol_table_t *table, symbol_t *symbol)
@@ -47,9 +49,11 @@ symbol_table_t *symbol_table_push(symbol_table_t *table)
 
 void symbol_table_free(symbol_table_t *table)
 {
-    if (table->next != NULL) {
-        symbol_table_free(table->next);
-        hashset_free(table->symbols);
+    if (table == NULL) {
+        return;
     }
+
+    symbol_table_free(table->next);
+    hashset_free(table->symbols);
     free(table);
 }

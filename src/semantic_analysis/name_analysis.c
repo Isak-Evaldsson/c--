@@ -36,7 +36,6 @@ static void name_analysis_stmt(symbol_table_t *scope, AST_stmt *stmt)
 
 static void name_analysis_func_def(symbol_table_t *scope,
                                    AST_func_def *func_def)
-
 {
     AST_stmt_list *stmt;
     AST_param_list *param;
@@ -52,12 +51,14 @@ static void name_analysis_func_def(symbol_table_t *scope,
 }
 
 // Traverses through the symbol table and performs name analysis
-bool name_analysis(AST_func_list *ast)
+bool name_analysis(AST_root *ast)
 {
-    symbol_table_t *global_scope = create_symbol_table();
+    symbol_table_t *scope = create_symbol_table();
+    ast->global_scope = scope;
 
-    for (AST_func_list *func = ast; func != NULL; func = func->next) {
-        name_analysis_func_def(global_scope, func->func_def);
+    for (AST_func_list *func = ast->functions; func != NULL;
+         func = func->next) {
+        name_analysis_func_def(scope, func->func_def);
     }
 
     return error_list_empty();

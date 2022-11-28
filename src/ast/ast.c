@@ -2,6 +2,14 @@
 #include "parser.h"
 #include "util.h"
 
+AST_root *create_ast_root(AST_func_list *functions)
+{
+    AST_root *root = xmalloc(sizeof(AST_root));
+    root->functions = functions;
+    root->global_scope = NULL;
+    return root;
+}
+
 AST_func_list *create_func_list(AST_func_def *def, AST_func_list *next)
 {
     AST_func_list *list = xmalloc(sizeof(AST_func_list));
@@ -12,10 +20,10 @@ AST_func_list *create_func_list(AST_func_def *def, AST_func_list *next)
 
 AST_func_def *create_func_def(AST_prototype *proto, AST_stmt_list *stmts)
 {
-    AST_func_def *func_decl = xmalloc(sizeof(AST_func_def));
-    func_decl->proto = proto;
-    func_decl->stmts = stmts;
-    return func_decl;
+    AST_func_def *func_def = xmalloc(sizeof(AST_func_def));
+    func_def->proto = proto;
+    func_def->stmts = stmts;
+    return func_def;
 }
 
 AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params)
@@ -179,6 +187,13 @@ AST_expr_list *create_expr_list(AST_expr *expr, AST_expr_list *next)
     list->expr = expr;
     list->next = next;
     return list;
+}
+
+void free_ast_root(AST_root *root)
+{
+    free_func_list(root->functions);
+    symbol_table_free(root->global_scope);
+    free(root);
 }
 
 void free_func_list(AST_func_list *list)

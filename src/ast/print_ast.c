@@ -2,7 +2,20 @@
 #include "ast.h"
 #include <stdio.h>
 
-void print_proto(AST_prototype *proto, FILE *fp)
+/*
+    Helper function declarations
+*/
+static void print_func_list(AST_func_list *list, FILE *fp);
+static void print_proto(AST_prototype *func, FILE *fp);
+static void print_stmt_list(AST_stmt_list *list, int level, FILE *fp);
+static void print_stmt(AST_stmt *stmt, int level, FILE *fp);
+static void print_expr_list(AST_expr_list *list, int level, FILE *fp);
+static void print_expr(AST_expr *expr, int level, FILE *fp);
+
+/*
+    Internal print functions
+*/
+static void print_proto(AST_prototype *proto, FILE *fp)
 {
     AST_param_list *param;
 
@@ -16,7 +29,7 @@ void print_proto(AST_prototype *proto, FILE *fp)
     }
 }
 
-void print_func_list(AST_func_list *list, FILE *fp)
+static void print_func_list(AST_func_list *list, FILE *fp)
 {
     print_proto(list->func_def->proto, fp);
     print_stmt_list(list->func_def->stmts, 1, fp);
@@ -24,7 +37,7 @@ void print_func_list(AST_func_list *list, FILE *fp)
         print_func_list(list->next, fp);
 }
 
-void print_stmt_list(AST_stmt_list *list, int level, FILE *fp)
+static void print_stmt_list(AST_stmt_list *list, int level, FILE *fp)
 {
     AST_stmt_list *entry;
 
@@ -33,7 +46,7 @@ void print_stmt_list(AST_stmt_list *list, int level, FILE *fp)
     }
 }
 
-void print_stmt(AST_stmt *stmt, int level, FILE *fp)
+static void print_stmt(AST_stmt *stmt, int level, FILE *fp)
 {
     for (size_t i = 0; i < level * INDENT; i++)
         fputc(' ', fp);
@@ -102,7 +115,7 @@ void print_stmt(AST_stmt *stmt, int level, FILE *fp)
     }
 }
 
-void print_expr_list(AST_expr_list *list, int level, FILE *fp)
+static void print_expr_list(AST_expr_list *list, int level, FILE *fp)
 {
     AST_expr_list *entry;
 
@@ -132,7 +145,7 @@ static const char *binop2string(binop_type op)
     }
 }
 
-void print_expr(AST_expr *expr, int level, FILE *fp)
+static void print_expr(AST_expr *expr, int level, FILE *fp)
 {
     const char *op_str;
 
@@ -170,5 +183,15 @@ void print_expr(AST_expr *expr, int level, FILE *fp)
     default:
         fprintf(fp, "UknownExpr: %d\n", expr->type);
         break;
+    }
+}
+
+/*
+    Print api
+*/
+void print_ast(AST_root *ast, FILE *fp)
+{
+    if (ast->functions != NULL) {
+        print_func_list(ast->functions, fp);
     }
 }
