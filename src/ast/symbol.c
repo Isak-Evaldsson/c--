@@ -25,6 +25,16 @@ static symbol_t *alloc_symbol(char *string, symbol_t *next)
     return sym;
 }
 
+static void free_symbol(symbol_t *s)
+{
+    if (s == NULL)
+        return;
+
+    free_symbol(s->next);
+    free(s->name);
+    free(s);
+}
+
 static unsigned int hash(char *s0)
 {
     unsigned int h = 0;
@@ -54,3 +64,18 @@ symbol_t *get_symbol(char *name)
 }
 
 char *symbol_name(symbol_t *sym) { return sym->name; }
+
+void free_symbols()
+{
+    // Free invidual symbols
+    for (size_t i = 0; i < SIZE; i++) {
+        symbol_t *sym = hashtable[i];
+
+        if (sym != NULL) {
+            free_symbol(sym);
+        }
+    }
+
+    // Clear table
+    memset(hashtable, 0, SIZE * sizeof(hashtable[0]));
+}

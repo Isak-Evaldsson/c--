@@ -29,11 +29,8 @@ test_bin = executable('tests',
     sources: ['tests/test_framework.c', 'tests/main.c', src],
     include_directories: inc,
     c_args: [
-        '-fsanitize-recover=address',
-        '-fsanitize=address',
-        '-g'
+        '-g',
     ],
-    link_args: ['-lasan'],
     dependencies: ilib_dep,
 )
 
