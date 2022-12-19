@@ -1,3 +1,4 @@
 [submodule "I-Lib"]
 	path = I-Lib
 	url = git@github.com:Isak-Evaldsson/I-Lib.git
+	update = merge
