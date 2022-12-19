@@ -1,9 +1,16 @@
 project('mycompiler', 'c',
         default_options : ['c_std=c17'])
 
+cc = meson.get_compiler('c')
+
 # src/include collecting all the src files
 src = []
 inc = []
+
+# Adding I-Lib dependency
+inc += include_directories('./I-Lib/include')
+ilib_dir = meson.current_source_dir() / 'I-Lib/build'
+ilib_dep = cc.find_library('i', dirs : ilib_dir)
 
 # subdirs adding src files
 subdir('src/ast')
@@ -26,7 +33,8 @@ test_bin = executable('tests',
         '-fsanitize=address',
         '-g'
     ],
-    link_args: ['-lasan']
+    link_args: ['-lasan'],
+    dependencies: ilib_dep,
 )
 
 test('unit tests', test_bin, args: meson.current_source_dir() / 'tests')
