@@ -14,4 +14,7 @@ symbol_t *get_symbol(char *name);
 // Return the name associated to a symbol
 char *symbol_name(symbol_t *sym);
 
+// Frees the global symbol table
+void free_symbols();
+
 #endif

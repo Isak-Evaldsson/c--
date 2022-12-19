@@ -14,8 +14,9 @@ static void parse_test(FILE *out_file, char *path)
 
     print_func_list(ast, out_file);
 
-    // Make sure theres no memory leaks
+    // Make sure there's no memory leaks
     free_func_list(ast);
+    free_symbols();
 }
 
 static void name_analysis_test(FILE *out_file, char *path)
@@ -36,6 +37,7 @@ static void name_analysis_test(FILE *out_file, char *path)
 
     // Make sure theres no memory leaks
     free_func_list(ast);
+    free_symbols();
 }
 
 int main(int argc, char **argv)
