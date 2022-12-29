@@ -16,7 +16,7 @@ void set_token_data(token_data_t *token)
     token->line_pos = token_pos;
 };
 
-AST_func_list *parse(char *file_name)
+AST_root *parse(char *file_name)
 {
     error_list_init(file_name);
 
@@ -33,5 +33,5 @@ AST_func_list *parse(char *file_name)
     fclose(yyin);
     yylex_destroy();
 
-    return (error == 0) ? ast_root : NULL;
+    return (error == 0) ? create_ast_root(ast_root) : NULL;
 }

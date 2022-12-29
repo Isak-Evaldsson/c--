@@ -2,8 +2,10 @@
 #define AST_HEADER
 
 #include "symbol.h"
+#include "symbol_table.h"
 
 /* Typedef Ast nodes */
+typedef struct AST_root AST_root;
 typedef struct AST_func_list AST_func_list;
 typedef struct AST_func_def AST_func_def;
 typedef struct AST_prototype AST_prototype;
@@ -43,6 +45,11 @@ struct token_data_t {
 };
 
 /* Ast node definitions */
+struct AST_root {
+    AST_func_list *functions;
+    symbol_table_t *global_scope;
+};
+
 struct AST_func_list {
     AST_func_def *func_def;
     AST_func_list *next;
@@ -117,6 +124,7 @@ struct AST_expr_list {
 };
 
 /* Constructors */
+AST_root *create_ast_root(AST_func_list *functions);
 AST_func_list *create_func_list(AST_func_def *def, AST_func_list *next);
 AST_func_def *create_func_def(AST_prototype *proto, AST_stmt_list *stmt);
 AST_prototype *create_prototype_ast(char *identifier, AST_param_list *params);
@@ -136,6 +144,7 @@ AST_func_call *create_func_call(char *identifier, AST_expr_list *args);
 AST_expr_list *create_expr_list(AST_expr *expr, AST_expr_list *next);
 
 /* Destructors */
+void free_ast_root(AST_root *root);
 void free_func_list(AST_func_list *list);
 void free_func_def(AST_func_def *def);
 void free_prototype(AST_prototype *proto);

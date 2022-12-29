@@ -7,6 +7,6 @@
 #include "ast.h"
 #include <stdbool.h>
 
-bool name_analysis(AST_func_list *ast);
+bool name_analysis(AST_root *ast);
 
 #endif /* SEMANTIC_ANALYSIS_H */

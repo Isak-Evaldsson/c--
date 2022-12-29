@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 {
     char *file_name;
     char *debug_flag;
-    AST_func_list *ast = NULL;
+    AST_root *ast = NULL;
 
     if (argc < 2) {
         print_help(argv[0]);
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     // dump ast if specified
     if (debug_flag != NULL && streq(debug_flag, "ast")) {
         printf("Parsing successful. Dumping ast:\n");
-        print_func_list(ast, stdout);
+        print_ast(ast, stdout);
         goto end;
     }
 
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     printf("Compilation successful\n");
 
 end:
-    free_func_list(ast);
+    free_ast_root(ast);
     error_list_free();
     return 0;
 }

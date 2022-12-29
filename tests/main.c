@@ -5,38 +5,35 @@
 
 static void parse_test(FILE *out_file, char *path)
 {
-    AST_func_list *ast = parse(path);
+    AST_root *ast = parse(path);
 
     if (ast == NULL) {
         fprintf(out_file, "PARSING ERROR for %s\n", path);
         return;
     }
 
-    print_func_list(ast, out_file);
+    print_ast(ast, out_file);
 
     // Make sure there's no memory leaks
-    free_func_list(ast);
+    free_ast_root(ast);
     free_symbols();
 }
 
 static void name_analysis_test(FILE *out_file, char *path)
 {
-    AST_func_list *ast = parse(path);
+    AST_root *ast = parse(path);
 
     if (ast == NULL) {
         fprintf(out_file, "PARSING ERROR for %s\n", path);
         return;
     }
 
-    fprintf(out_file, "Failure");
-
     if (!name_analysis(ast)) {
         error_list_print(out_file, false);
-        return;
     };
 
     // Make sure theres no memory leaks
-    free_func_list(ast);
+    free_ast_root(ast);
     free_symbols();
 }
 

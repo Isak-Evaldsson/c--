@@ -69,8 +69,12 @@ void error_list_print(FILE *out, bool file_name)
     error_msg *list;
 
     for (list = head; list != NULL; list = list->next) {
-        fprintf(out, "%s: %d.%d: %s\n", (file_name) ? fileName : "", list->line,
-                list->pos, list->msg);
+        if (file_name) {
+            fprintf(out, "%s: %d.%d: %s\n", fileName, list->line, list->pos,
+                    list->msg);
+        } else {
+            fprintf(out, "%d.%d: %s\n", list->line, list->pos, list->msg);
+        }
     }
 }
 
